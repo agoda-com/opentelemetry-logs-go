@@ -58,12 +58,12 @@ package main
 
 import (
 	"context"
-	"github.com/agoda-com/opentelemetry-logs-go/otel"
-	"github.com/agoda-com/opentelemetry-logs-go/otel/exporters/otlp/otlplogs"
-	"github.com/agoda-com/opentelemetry-logs-go/otel/exporters/otlp/otlplogs/otlplogshttp"
+	"github.com/agoda-com/opentelemetry-logs-go"
+	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
+	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/otlplogshttp"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
-	sdk "github.com/agoda-com/opentelemetry-logs-go/otel/sdk/logs"
+	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 )
 
 func newResource() *resource.Resource {

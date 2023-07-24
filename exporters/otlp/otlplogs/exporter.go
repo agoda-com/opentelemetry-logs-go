@@ -2,8 +2,8 @@ package otlplogs
 
 import (
 	"context"
-	"github.com/agoda-com/opentelemetry-logs-go/otel/exporters/otlp/otlplogs/internal/logstransform"
-	logssdk "github.com/agoda-com/opentelemetry-logs-go/otel/sdk/logs"
+	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/logstransform"
+	logssdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 	"sync"
 )
 

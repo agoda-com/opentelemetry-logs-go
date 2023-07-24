@@ -1,9 +1,9 @@
-package logs // Package logs import "github.com/agoda-com/opentelemetry-logs-go/otel/sdk/logs"
+package logs // Package logs import "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 import (
 	"context"
 	"fmt"
-	"github.com/agoda-com/opentelemetry-logs-go/otel/internal/global"
-	"github.com/agoda-com/opentelemetry-logs-go/otel/logs"
+	"github.com/agoda-com/opentelemetry-logs-go/internal/global"
+	"github.com/agoda-com/opentelemetry-logs-go/logs"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/sdk/instrumentation"
 	"go.opentelemetry.io/otel/sdk/resource"

@@ -1,8 +1,8 @@
 package otel
 
 import (
-	"github.com/agoda-com/opentelemetry-logs-go/otel/internal/global"
-	"github.com/agoda-com/opentelemetry-logs-go/otel/logs"
+	"github.com/agoda-com/opentelemetry-logs-go/internal/global"
+	"github.com/agoda-com/opentelemetry-logs-go/logs"
 )
 
 // GetLoggerProvider returns the registered global logger provider.

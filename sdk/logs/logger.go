@@ -1,8 +1,8 @@
 package logs
 
 import (
-	"github.com/agoda-com/opentelemetry-logs-go/otel/logs"
-	"github.com/agoda-com/opentelemetry-logs-go/otel/semconv"
+	"github.com/agoda-com/opentelemetry-logs-go/logs"
+	"github.com/agoda-com/opentelemetry-logs-go/semconv"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/instrumentation"
 	"go.opentelemetry.io/otel/sdk/resource"

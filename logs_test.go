@@ -1,7 +1,7 @@
 package otel
 
 import (
-	"github.com/agoda-com/opentelemetry-logs-go/otel/logs"
+	"github.com/agoda-com/opentelemetry-logs-go/logs"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

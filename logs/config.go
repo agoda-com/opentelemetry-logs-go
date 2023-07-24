@@ -1,4 +1,4 @@
-package logs // Package logs import "github.com/agoda-com/opentelemetry-logs-go/otel/logs"
+package logs // Package logs import "github.com/agoda-com/opentelemetry-logs-go/logs"
 
 import "go.opentelemetry.io/otel/attribute"
 

@@ -3,7 +3,7 @@ package otlpconfig
 import (
 	"crypto/tls"
 	"crypto/x509"
-	envconfig "github.com/agoda-com/opentelemetry-logs-go/otel/exporters/otlp/internal"
+	envconfig "github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal"
 	"net/url"
 	"os"
 	"path"

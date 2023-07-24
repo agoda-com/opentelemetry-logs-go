@@ -1,7 +1,7 @@
 package global
 
 import (
-	"github.com/agoda-com/opentelemetry-logs-go/otel/logs"
+	"github.com/agoda-com/opentelemetry-logs-go/logs"
 	"sync"
 	"sync/atomic"
 )

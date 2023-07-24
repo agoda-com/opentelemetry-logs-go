@@ -2,7 +2,7 @@ package otlplogshttp
 
 import (
 	"context"
-	"github.com/agoda-com/opentelemetry-logs-go/otel/exporters/otlp/otlplogs"
+	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
 )
 
 // New constructs a new Exporter and starts it.

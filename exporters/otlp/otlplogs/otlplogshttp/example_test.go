@@ -2,10 +2,10 @@ package otlplogshttp
 
 import (
 	"context"
-	"github.com/agoda-com/opentelemetry-logs-go/otel"
-	"github.com/agoda-com/opentelemetry-logs-go/otel/exporters/otlp/otlplogs"
-	"github.com/agoda-com/opentelemetry-logs-go/otel/logs"
-	sdk "github.com/agoda-com/opentelemetry-logs-go/otel/sdk/logs"
+	"github.com/agoda-com/opentelemetry-logs-go"
+	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
+	"github.com/agoda-com/opentelemetry-logs-go/logs"
+	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	"log"

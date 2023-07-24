@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/agoda-com/opentelemetry-logs-go/otel/internal/global"
+	"github.com/agoda-com/opentelemetry-logs-go/internal/global"
 )
 
 // ConfigFn is the generic function used to set a config.
