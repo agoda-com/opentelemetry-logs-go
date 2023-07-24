@@ -59,7 +59,7 @@ type LogRecord struct {
 	attributes           *[]attribute.KeyValue
 }
 
-func (l LogRecord) Timestamp() *time.Time                        { return l.Timestamp() }
+func (l LogRecord) Timestamp() *time.Time                        { return l.timestamp }
 func (l LogRecord) ObservedTimestamp() time.Time                 { return l.observedTimestamp }
 func (l LogRecord) TraceId() *trace.TraceID                      { return l.traceId }
 func (l LogRecord) SpanId() *trace.SpanID                        { return l.spanId }
