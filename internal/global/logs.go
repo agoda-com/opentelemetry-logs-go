@@ -91,12 +91,15 @@ type logger struct {
 	delegate atomic.Value
 }
 
-func (t *logger) Emit(logRecord logs.LogRecord) {
-	t.Emit(logRecord)
-}
-
 // Compile-time guarantee that logger implements the logs.Logger interface.
 var _ logs.Logger = &logger{}
+
+func (t *logger) Emit(logRecord logs.LogRecord) {
+	delegate := t.delegate.Load()
+	if delegate != nil {
+		delegate.(logs.Logger).Emit(logRecord)
+	}
+}
 
 // setDelegate configures t to delegate all Tracer functionality to Loggers
 // created by provider.
