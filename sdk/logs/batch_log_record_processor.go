@@ -2,7 +2,7 @@ package logs
 
 import (
 	"context"
-	"github.com/agoda-com/otellogs-go/otel/sdk/internal/env"
+	"github.com/agoda-com/opentelemetry-logs-go/otel/sdk/internal/env"
 	"go.opentelemetry.io/otel"
 	"runtime"
 	"sync"

@@ -1,4 +1,4 @@
-module github.com/agoda-com/otellogs-go/otel
+module github.com/agoda-com/opentelemetry-logs-go/otel
 
 go 1.20
 
