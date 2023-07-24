@@ -43,7 +43,7 @@ func doSomething() {
 
 func installExportPipeline(ctx context.Context) (func(context.Context) error, error) {
 	client := NewClient()
-	exporter := otlplogs.New(ctx, client)
+	exporter, _ := otlplogs.New(ctx, client)
 
 	loggerProvider := sdk.NewLoggerProvider(
 		sdk.WithBatcher(exporter),

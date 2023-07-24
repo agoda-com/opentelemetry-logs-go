@@ -2,9 +2,14 @@ package otlplogs
 
 import (
 	"context"
+	"errors"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/logstransform"
 	logssdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 	"sync"
+)
+
+var (
+	errAlreadyStarted = errors.New("already started")
 )
 
 type Exporter struct {
@@ -15,6 +20,19 @@ type Exporter struct {
 
 	startOnce sync.Once
 	stopOnce  sync.Once
+}
+
+// Start establishes a connection to the receiving endpoint.
+func (e *Exporter) Start(ctx context.Context) error {
+	var err = errAlreadyStarted
+	e.startOnce.Do(func() {
+		e.mu.Lock()
+		e.started = true
+		e.mu.Unlock()
+		err = e.client.Start(ctx)
+	})
+
+	return err
 }
 
 func (e *Exporter) Shutdown(ctx context.Context) error {
@@ -53,8 +71,12 @@ func (e *Exporter) Export(ctx context.Context, ll []logssdk.ReadableLogRecord) e
 }
 
 // New creates new Exporter with provided client
-func New(_ context.Context, client Client) *Exporter {
-	return &Exporter{
+func New(ctx context.Context, client Client) (*Exporter, error) {
+	exp := &Exporter{
 		client: client,
 	}
+	if err := exp.Start(ctx); err != nil {
+		return nil, err
+	}
+	return exp, nil
 }

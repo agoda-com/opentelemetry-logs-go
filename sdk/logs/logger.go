@@ -24,6 +24,8 @@ func (l logger) Emit(logRecord logs.LogRecord) {
 		return
 	}
 
+	pr := l.provider.resource
+
 	elr := &exportableLogRecord{
 		timestamp:            logRecord.Timestamp(),
 		observedTimestamp:    logRecord.ObservedTimestamp(),
@@ -33,7 +35,7 @@ func (l logger) Emit(logRecord logs.LogRecord) {
 		severityText:         logRecord.SeverityText(),
 		severityNumber:       logRecord.SeverityNumber(),
 		body:                 logRecord.Body(),
-		resource:             logRecord.Resource(),
+		resource:             pr,
 		instrumentationScope: logRecord.InstrumentationScope(),
 		attributes:           logRecord.Attributes(),
 	}
