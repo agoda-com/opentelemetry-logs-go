@@ -32,12 +32,30 @@ func (fn loggerProviderOptionFunc) apply(cfg loggerProviderConfig) loggerProvide
 	return fn(cfg)
 }
 
-// WithLogsProcessor will configure processor to process logs
-func WithLogsProcessor(logsProcessor LogRecordProcessor) LoggerProviderOption {
+// WithLogRecordProcessor will configure processor to process logs
+func WithLogRecordProcessor(logsProcessor LogRecordProcessor) LoggerProviderOption {
 	return loggerProviderOptionFunc(func(cfg loggerProviderConfig) loggerProviderConfig {
 		cfg.processors = append(cfg.processors, logsProcessor)
 		return cfg
 	})
+}
+
+// WithSyncer registers the exporter with the LoggerProvider using a
+// SimpleLogRecordProcessor.
+//
+// This is not recommended for production use. The synchronous nature of the
+// SimpleLogRecordProcessor that will wrap the exporter make it good for testing,
+// debugging, or showing examples of other feature, but it will be slow and
+// have a high computation resource usage overhead. The WithBatcher option is
+// recommended for production use instead.
+func WithSyncer(e LogRecordExporter) LoggerProviderOption {
+	return WithLogRecordProcessor(NewSimpleLogRecordProcessor(e))
+}
+
+// WithBatcher registers the exporter with the TracerProvider using a
+// BatchSpanProcessor configured with the passed opts.
+func WithBatcher(e LogRecordExporter, opts ...BatchLogRecordProcessorOption) LoggerProviderOption {
+	return WithLogRecordProcessor(NewBatchLogRecordProcessor(e, opts...))
 }
 
 // WithResource will configure OTLP logger with common resource attributes.
@@ -72,10 +90,52 @@ type LoggerProvider struct {
 
 var _ logs.LoggerProvider = &LoggerProvider{}
 
-func (lp LoggerProvider) Logger(name string, options ...logs.LoggerOption) logs.Logger {
+func (lp *LoggerProvider) Logger(name string, opts ...logs.LoggerOption) logs.Logger {
 
-	//TODO implement me
-	panic("implement me")
+	if lp.isShutdown.Load() {
+		return logs.NewNoopLoggerProvider().Logger(name, opts...)
+	}
+
+	c := logs.NewLoggerConfig(opts...)
+
+	if name == "" {
+		name = defaultLoggerName
+	}
+
+	is := instrumentation.Scope{
+		Name:      name,
+		Version:   c.InstrumentationVersion(),
+		SchemaURL: c.SchemaURL(),
+	}
+
+	t, ok := func() (logs.Logger, bool) {
+		lp.mu.Lock()
+		defer lp.mu.Unlock()
+		// Must check the flag after acquiring the mutex to avoid returning a valid logger if Shutdown() ran
+		// after the first check above but before we acquired the mutex.
+		if lp.isShutdown.Load() {
+			return logs.NewNoopLoggerProvider().Logger(name, opts...), true
+		}
+
+		t, ok := lp.namedLogger[is]
+		if !ok {
+			t = &logger{
+				provider:             lp,
+				instrumentationScope: is,
+			}
+		}
+		return t, ok
+	}()
+	if !ok {
+		// This code is outside the mutex to not hold the lock while calling third party logging code:
+		// - That code may do slow things like I/O, which would prolong the duration the lock is held,
+		//   slowing down all tracing consumers.
+		// - Logging code may be instrumented with logging and deadlock because it could try
+		//   acquiring the same non-reentrant mutex.
+		global.Info("Logger created", "name", name, "version", is.Version, "schemaURL", is.SchemaURL)
+
+	}
+	return t
 }
 
 var _ logs.LoggerProvider = &LoggerProvider{}

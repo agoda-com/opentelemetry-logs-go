@@ -30,7 +30,7 @@ var _ LogRecordProcessor = (*simpleLogRecordProcessor)(nil)
 // nature of this LogRecordProcessor make it good for testing, debugging, or
 // showing examples of other feature, but it will be slow and have a high
 // computation resource usage overhead. The BatchLogsProcessor is recommended
-// for production use instead. Please help to contribute and create one :)
+// for production use instead.
 func NewSimpleLogRecordProcessor(exporter LogRecordExporter) LogRecordProcessor {
 	slp := &simpleLogRecordProcessor{
 		exporter: exporter,
@@ -40,7 +40,7 @@ func NewSimpleLogRecordProcessor(exporter LogRecordExporter) LogRecordProcessor 
 	return slp
 }
 
-// Process immediately exports a Log
+// OnEmit Process immediately emits a LogRecord
 func (lrp *simpleLogRecordProcessor) OnEmit(rol ReadableLogRecord) {
 	lrp.exporterMu.Lock()
 	defer lrp.exporterMu.Unlock()
@@ -50,7 +50,7 @@ func (lrp *simpleLogRecordProcessor) OnEmit(rol ReadableLogRecord) {
 	}
 }
 
-// MarshalLog is the marshaling function used by the logging system to represent this Span Processor.
+// MarshalLog is the marshaling function used by the logging system to represent this LogRecord Processor.
 func (lrp *simpleLogRecordProcessor) MarshalLog() interface{} {
 	return struct {
 		Type     string

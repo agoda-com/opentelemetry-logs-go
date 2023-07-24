@@ -1,4 +1,4 @@
-package logs
+package logs // Package logs import "github.com/agoda-com/opentelemetry-logs-go/otel/logs"
 
 import "go.opentelemetry.io/otel/attribute"
 
@@ -44,4 +44,30 @@ type loggerOptionFunc func(LoggerConfig) LoggerConfig
 
 func (fn loggerOptionFunc) apply(cfg LoggerConfig) LoggerConfig {
 	return fn(cfg)
+}
+
+// WithInstrumentationVersion sets the instrumentation version.
+func WithInstrumentationVersion(version string) LoggerOption {
+	return loggerOptionFunc(func(cfg LoggerConfig) LoggerConfig {
+		cfg.instrumentationVersion = version
+		return cfg
+	})
+}
+
+// WithInstrumentationAttributes sets the instrumentation attributes.
+//
+// The passed attributes will be de-duplicated.
+func WithInstrumentationAttributes(attr ...attribute.KeyValue) LoggerOption {
+	return loggerOptionFunc(func(config LoggerConfig) LoggerConfig {
+		config.attrs = attribute.NewSet(attr...)
+		return config
+	})
+}
+
+// WithSchemaURL sets the schema URL for the Logger.
+func WithSchemaURL(schemaURL string) LoggerOption {
+	return loggerOptionFunc(func(cfg LoggerConfig) LoggerConfig {
+		cfg.schemaURL = schemaURL
+		return cfg
+	})
 }

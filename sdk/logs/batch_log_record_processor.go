@@ -18,8 +18,8 @@ const (
 	DefaultMaxExportBatchSize = 512
 )
 
-// BatchLogsProcessorOption configures a BatchLogsProcessor.
-type BatchLogsProcessorOption func(o *BatchLogRecordProcessorOptions)
+// BatchLogRecordProcessorOption configures a BatchLogsProcessor.
+type BatchLogRecordProcessorOption func(o *BatchLogRecordProcessorOptions)
 
 // BatchLogRecordProcessorOptions is configuration settings for a
 // BatchLogsProcessor.
@@ -100,7 +100,7 @@ var _ LogRecordProcessor = (*batchLogRecordProcessor)(nil)
 //
 // If the exporter is nil, the logs processor will perform no action.
 // see https://opentelemetry.io/docs/specs/otel/logs/sdk/#batching-processor
-func NewBatchLogRecordProcessor(exporter LogRecordExporter, options ...BatchLogsProcessorOption) LogRecordProcessor {
+func NewBatchLogRecordProcessor(exporter LogRecordExporter, options ...BatchLogRecordProcessorOption) LogRecordProcessor {
 	maxQueueSize := env.BatchLogsProcessorMaxQueueSize(DefaultMaxQueueSize)
 	maxExportBatchSize := env.BatchLogsProcessorMaxExportBatchSize(DefaultMaxExportBatchSize)
 
