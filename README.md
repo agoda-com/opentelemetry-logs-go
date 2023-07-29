@@ -26,6 +26,13 @@ this API to bridge between existing logging libraries and the OpenTelemetry log 
 Example bellow will show how logging library could be instrumented with current API:
 
 ```go
+package myInstrumentedLogger
+
+import (
+	otel "github.com/agoda-com/opentelemetry-logs-go"
+	"github.com/agoda-com/opentelemetry-logs-go/logs"
+	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
+)
 
 const (
   instrumentationName = "otel/zap"
@@ -46,7 +53,7 @@ func (c otlpCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
     Body: &ent.Message,
 	...
   }
-  logRecord := logs.NewLogRecord(cfg)
+  logRecord := logs.NewLogRecord(lrc)
   logger.Emit(logRecord)
 }
 ```
@@ -77,8 +84,9 @@ func newResource() *resource.Resource {
 func main() {
 	ctx := context.Background()
 
+	exporter, _ := otlplogs.New(ctx, otlplogshttp.NewClient())
 	loggerProvider := sdk.NewLoggerProvider(
-		sdk.WithBatcher(otlplogs.New(ctx, otlplogshttp.NewClient())),
+		sdk.WithBatcher(exporter),
 		sdk.WithResource(newResource()),
 	)
 	otel.SetLoggerProvider(loggerProvider)

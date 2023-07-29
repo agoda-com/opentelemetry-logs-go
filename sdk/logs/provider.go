@@ -160,13 +160,13 @@ var _ logs.LoggerProvider = &LoggerProvider{}
 func NewLoggerProvider(opts ...LoggerProviderOption) *LoggerProvider {
 	o := loggerProviderConfig{}
 
-	// TODO: o = applyLoggerProviderEnvConfigs(o)
+	o = applyLoggerProviderEnvConfigs(o)
 
 	for _, opt := range opts {
 		o = opt.apply(o)
 	}
 
-	// TODO: o = ensureValidLoggerProviderConfig(o)
+	o = ensureValidLoggerProviderConfig(o)
 
 	lp := &LoggerProvider{
 		namedLogger: make(map[instrumentation.Scope]*logger),
@@ -184,17 +184,6 @@ func NewLoggerProvider(opts ...LoggerProviderOption) *LoggerProvider {
 	return lp
 
 }
-
-//func (lp LoggerProvider) Send(rol ReadWriteLogRecord) {
-//
-//	// add resource level attributes
-//	rol.SetResource(lp.cfg.resource)
-//
-//	// process log
-//	for _, p := range lp.cfg.processors {
-//		p.OnEmit(rol)
-//	}
-//}
 
 func (p *LoggerProvider) getLogsProcessors() logRecordProcessorStates {
 	return *(p.logProcessors.Load())
@@ -258,4 +247,27 @@ func (p *LoggerProvider) ForceFlush(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+func applyLoggerProviderEnvConfigs(cfg loggerProviderConfig) loggerProviderConfig {
+	for _, opt := range loggerProviderOptionsFromEnv() {
+		cfg = opt.apply(cfg)
+	}
+
+	return cfg
+}
+
+func loggerProviderOptionsFromEnv() []LoggerProviderOption {
+	var opts []LoggerProviderOption
+
+	return opts
+}
+
+// ensureValidLoggerProviderConfig ensures that given LoggerProviderConfig is valid.
+func ensureValidLoggerProviderConfig(cfg loggerProviderConfig) loggerProviderConfig {
+
+	if cfg.resource == nil {
+		cfg.resource = resource.Default()
+	}
+	return cfg
 }
