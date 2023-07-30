@@ -27,7 +27,7 @@ type LogRecordExporter interface {
 	// DO NOT CHANGE: any modification will not be backwards compatible and
 	// must never be done outside of a new major release.
 
-	// Export exports a batch of spans.
+	// Export exports a batch of logs.
 	//
 	// This function is called synchronously, so there is no concurrency
 	// safety requirement. However, due to the synchronous calling pattern,

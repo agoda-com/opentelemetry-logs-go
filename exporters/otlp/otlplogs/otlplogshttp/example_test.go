@@ -75,7 +75,7 @@ func installExportPipeline(ctx context.Context) (func(context.Context) error, er
 func Example() {
 	{
 		ctx := context.Background()
-		// Registers a tracer Provider globally.
+		// Registers a logger Provider globally.
 		shutdown, err := installExportPipeline(ctx)
 		if err != nil {
 			log.Fatal(err)

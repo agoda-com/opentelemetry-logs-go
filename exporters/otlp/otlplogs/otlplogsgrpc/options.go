@@ -41,7 +41,7 @@ func asGRPCOptions(opts []Option) []otlpconfig.GRPCOption {
 	return converted
 }
 
-// RetryConfig defines configuration for retrying export of span batches that
+// RetryConfig defines configuration for retrying export of logs batches that
 // failed to be received by the target endpoint.
 //
 // This configuration does not define any network retry strategy. That is
@@ -164,9 +164,9 @@ func WithGRPCConn(conn *grpc.ClientConn) Option {
 }
 
 // WithTimeout sets the max amount of time a client will attempt to export a
-// batch of spans. This takes precedence over any retry settings defined with
+// batch of logs. This takes precedence over any retry settings defined with
 // WithRetry, once this time limit has been reached the export is abandoned
-// and the batch of spans is dropped.
+// and the batch of logs is dropped.
 //
 // If unset, the default timeout will be set to 10 seconds.
 func WithTimeout(duration time.Duration) Option {
@@ -174,7 +174,7 @@ func WithTimeout(duration time.Duration) Option {
 }
 
 // WithRetry sets the retry policy for transient retryable errors that may be
-// returned by the target endpoint when exporting a batch of spans.
+// returned by the target endpoint when exporting a batch of logs.
 //
 // If the target endpoint responds with not only a retryable error, but
 // explicitly returns a backoff time in the response. That time will take

@@ -69,8 +69,8 @@ func WithSyncer(e LogRecordExporter) LoggerProviderOption {
 	return WithLogRecordProcessor(NewSimpleLogRecordProcessor(e))
 }
 
-// WithBatcher registers the exporter with the TracerProvider using a
-// BatchSpanProcessor configured with the passed opts.
+// WithBatcher registers the exporter with the LoggerProvider using a
+// BatchLogRecordProcessor configured with the passed opts.
 func WithBatcher(e LogRecordExporter, opts ...BatchLogRecordProcessorOption) LoggerProviderOption {
 	return WithLogRecordProcessor(NewBatchLogRecordProcessor(e, opts...))
 }
@@ -228,7 +228,7 @@ func (p LoggerProvider) Shutdown(ctx context.Context) error {
 }
 
 // ForceFlush immediately exports all logs that have not yet been exported for
-// all the registered span processors.
+// all the registered log processors.
 func (p *LoggerProvider) ForceFlush(ctx context.Context) error {
 	spss := p.getLogsProcessors()
 	if len(spss) == 0 {

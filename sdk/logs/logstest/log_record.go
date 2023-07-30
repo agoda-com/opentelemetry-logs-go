@@ -13,7 +13,7 @@ import (
 // LogRecordStubs is a slice of LogRecordStub use for testing an SDK.
 type LogRecordStubs []LogRecordStub
 
-// Snapshots returns s as a slice of ReadOnlySpans.
+// Snapshots returns s as a slice of ReadableLogRecords.
 func (l LogRecordStubs) Snapshots() []logssdk.ReadableLogRecord {
 	if len(l) == 0 {
 		return nil
@@ -61,7 +61,7 @@ func LogRecordStubFromReadableLogRecord(rl logssdk.ReadableLogRecord) LogRecordS
 	}
 }
 
-// Snapshot returns a read-only copy of the SpanStub.
+// Snapshot returns a read-only copy of the LogRecordStub.
 func (s LogRecordStub) Snapshot() logssdk.ReadableLogRecord {
 	return &logRecordSnapshot{
 		timestamp:            s.Timestamp,

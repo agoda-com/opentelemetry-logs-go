@@ -36,11 +36,11 @@ type loggerProvider struct {
 // interface.
 var _ logs.LoggerProvider = &loggerProvider{}
 
-// setDelegate configures p to delegate all TracerProvider functionality to
+// setDelegate configures p to delegate all LoggerProvider functionality to
 // provider.
 //
-// All Tracers provided prior to this function call are switched out to be
-// Tracers provided by provider.
+// All Loggers provided prior to this function call are switched out to be
+// Loggers provided by provider.
 //
 // It is guaranteed by the caller that this happens only once.
 func (p *loggerProvider) setDelegate(provider logs.LoggerProvider) {
@@ -69,7 +69,7 @@ func (p *loggerProvider) Logger(name string, opts ...logs.LoggerOption) logs.Log
 		return p.delegate.Logger(name, opts...)
 	}
 
-	// At this moment it is guaranteed that no sdk is installed, save the tracer in the tracers map.
+	// At this moment it is guaranteed that no sdk is installed, save the logger in the loggers map.
 
 	c := logs.NewLoggerConfig(opts...)
 	key := il{
@@ -117,7 +117,7 @@ func (t *logger) Emit(logRecord logs.LogRecord) {
 	}
 }
 
-// setDelegate configures t to delegate all Tracer functionality to Loggers
+// setDelegate configures t to delegate all Logger functionality to Loggers
 // created by provider.
 //
 // All subsequent calls to the Logger methods will be passed to the delegate.

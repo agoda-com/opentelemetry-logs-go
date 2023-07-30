@@ -62,7 +62,7 @@ func (w wrappedOption) applyHTTPOption(cfg otlpconfig.Config) otlpconfig.Config 
 }
 
 // WithEndpoint allows one to set the address of the collector
-// endpoint that the driver will use to send spans. If
+// endpoint that the driver will use to send logs. If
 // unset, it will instead try to use
 // the default endpoint (localhost:4318). Note that the endpoint
 // must not contain any URL path.
@@ -76,7 +76,7 @@ func WithCompression(compression Compression) Option {
 }
 
 // WithURLPath allows one to override the default URL path used
-// for sending traces. If unset, default ("/v1/traces") will be used.
+// for sending logs. If unset, default ("/v1/logs") will be used.
 func WithURLPath(urlPath string) Option {
 	return wrappedOption{otlpconfig.WithURLPath(urlPath)}
 }
@@ -102,13 +102,13 @@ func WithHeaders(headers map[string]string) Option {
 }
 
 // WithTimeout tells the driver the max waiting time for the backend to process
-// each spans batch.  If unset, the default will be 10 seconds.
+// each logs batch.  If unset, the default will be 10 seconds.
 func WithTimeout(duration time.Duration) Option {
 	return wrappedOption{otlpconfig.WithTimeout(duration)}
 }
 
 // WithRetry configures the retry policy for transient errors that may occurs
-// when exporting traces. An exponential back-off algorithm is used to ensure
+// when exporting logs. An exponential back-off algorithm is used to ensure
 // endpoints are not overwhelmed with retries. If unset, the default retry
 // policy will retry after 5 seconds and increase exponentially after each
 // error for a total of 1 minute.

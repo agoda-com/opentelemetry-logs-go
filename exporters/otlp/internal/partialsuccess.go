@@ -38,11 +38,11 @@ func (ps PartialSuccess) Error() string {
 var _ error = PartialSuccess{}
 
 // LogRecordPartialSuccessError returns an error describing a partial success
-// response for the trace signal.
+// response for the log signal.
 func LogRecordPartialSuccessError(itemsRejected int64, errorMessage string) error {
 	return PartialSuccess{
 		ErrorMessage:  errorMessage,
 		RejectedItems: itemsRejected,
-		RejectedKind:  "spans",
+		RejectedKind:  "logs",
 	}
 }

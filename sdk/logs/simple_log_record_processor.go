@@ -51,7 +51,7 @@ func NewSimpleLogRecordProcessor(exporter LogRecordExporter) LogRecordProcessor 
 	slp := &simpleLogRecordProcessor{
 		exporter: exporter,
 	}
-	log.Printf("SimpleLogsProcessor is not recommended for production use, consider using BatchSpanProcessor instead.")
+	log.Printf("SimpleLogsProcessor is not recommended for production use, consider using BatchLogRecordProcessor instead.")
 
 	return slp
 }

@@ -76,7 +76,7 @@ type client struct {
 
 var _ otlplogs.Client = (*client)(nil)
 
-// NewClient creates a new HTTP trace client.
+// NewClient creates a new HTTP logs client.
 func NewClient(opts ...Option) otlplogs.Client {
 	cfg := otlpconfig.NewHTTPConfig(asHTTPOptions(opts)...)
 

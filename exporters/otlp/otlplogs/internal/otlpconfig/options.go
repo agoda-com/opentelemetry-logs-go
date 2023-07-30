@@ -33,10 +33,10 @@ import (
 
 const (
 	// DefaultLogsPath is a default URL path for endpoint that
-	// receives spans.
+	// receives logs.
 	DefaultLogsPath string = "/v1/logs"
 	// DefaultTimeout is a default max waiting time for the backend to process
-	// each span batch.
+	// each logs batch.
 	DefaultTimeout time.Duration = 10 * time.Second
 )
 
