@@ -25,19 +25,12 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	"log"
+	"time"
 )
 
 const (
 	instrumentationName    = "github.com/instrumentron"
 	instrumentationVersion = "v0.1.0"
-)
-
-var (
-	logger = otel.GetLoggerProvider().Logger(
-		instrumentationName,
-		logs.WithInstrumentationVersion(instrumentationVersion),
-		logs.WithSchemaURL(semconv.SchemaURL),
-	)
 )
 
 func newResource() *resource.Resource {
@@ -49,9 +42,18 @@ func newResource() *resource.Resource {
 }
 
 func doSomething() {
+
+	logger := otel.GetLoggerProvider().Logger(
+		instrumentationName,
+		logs.WithInstrumentationVersion(instrumentationVersion),
+		logs.WithSchemaURL(semconv.SchemaURL),
+	)
+
 	body := "Body"
+	now := time.Now()
 	cfg := logs.LogRecordConfig{
-		Body: &body,
+		Timestamp: &now,
+		Body:      &body,
 	}
 	logRecord := logs.NewLogRecord(cfg)
 	logger.Emit(logRecord)
@@ -71,15 +73,19 @@ func installExportPipeline(ctx context.Context) (func(context.Context) error, er
 }
 
 func Example() {
-	ctx := context.Background()
-	// Registers a tracer Provider globally.
-	shutdown, err := installExportPipeline(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func() {
-		if err := shutdown(ctx); err != nil {
+	{
+		ctx := context.Background()
+		// Registers a logger Provider globally.
+		shutdown, err := installExportPipeline(ctx)
+		if err != nil {
 			log.Fatal(err)
 		}
-	}()
+		doSomething()
+
+		defer func() {
+			if err := shutdown(ctx); err != nil {
+				log.Fatal(err)
+			}
+		}()
+	}
 }

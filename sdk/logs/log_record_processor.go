@@ -49,7 +49,7 @@ type LogRecordProcessor interface {
 	// ForceFlush exports all ended logs to the configured Exporter that have not yet
 	// been exported.  It should only be called when absolutely necessary, such as when
 	// using a FaaS provider that may suspend the process after an invocation, but before
-	// the Processor can export the completed spans.
+	// the Processor can export the completed logs.
 	ForceFlush(ctx context.Context) error
 	// DO NOT CHANGE: any modification will not be backwards compatible and
 	// must never be done outside of a new major release.

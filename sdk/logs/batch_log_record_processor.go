@@ -40,24 +40,24 @@ type BatchLogRecordProcessorOption func(o *BatchLogRecordProcessorOptions)
 // BatchLogRecordProcessorOptions is configuration settings for a
 // BatchLogsProcessor.
 type BatchLogRecordProcessorOptions struct {
-	// MaxQueueSize is the maximum queue size to buffer spans for delayed processing. If the
-	// queue gets full it drops the spans. Use BlockOnQueueFull to change this behavior.
+	// MaxQueueSize is the maximum queue size to buffer logs for delayed processing. If the
+	// queue gets full it drops the logs. Use BlockOnQueueFull to change this behavior.
 	// The default value of MaxQueueSize is 2048.
 	MaxQueueSize int
 
 	// BatchTimeout is the maximum duration for constructing a batch. Processor
-	// forcefully sends available spans when timeout is reached.
+	// forcefully sends available logs when timeout is reached.
 	// The default value of BatchTimeout is 5000 msec.
 	BatchTimeout time.Duration
 
-	// ExportTimeout specifies the maximum duration for exporting spans. If the timeout
+	// ExportTimeout specifies the maximum duration for exporting logs. If the timeout
 	// is reached, the export will be cancelled.
 	// The default value of ExportTimeout is 30000 msec.
 	ExportTimeout time.Duration
 
-	// MaxExportBatchSize is the maximum number of spans to process in a single batch.
-	// If there are more than one batch worth of spans then it processes multiple batches
-	// of spans one batch after the other without any delay.
+	// MaxExportBatchSize is the maximum number of logs to process in a single batch.
+	// If there are more than one batch worth of logs then it processes multiple batches
+	// of logs one batch after the other without any delay.
 	// The default value of MaxExportBatchSize is 512.
 	MaxExportBatchSize int
 
@@ -66,6 +66,49 @@ type BatchLogRecordProcessorOptions struct {
 	// Blocking option should be used carefully as it can severely affect the performance of an
 	// application.
 	BlockOnQueueFull bool
+}
+
+// WithMaxQueueSize returns a BatchLogRecordProcessorOption that configures the
+// maximum queue size allowed for a BatchLogRecordProcessor.
+func WithMaxQueueSize(size int) BatchLogRecordProcessorOption {
+	return func(o *BatchLogRecordProcessorOptions) {
+		o.MaxQueueSize = size
+	}
+}
+
+// WithMaxExportBatchSize returns a BatchLogRecordProcessorOption that configures
+// the maximum export batch size allowed for a BatchLogRecordProcessor.
+func WithMaxExportBatchSize(size int) BatchLogRecordProcessorOption {
+	return func(o *BatchLogRecordProcessorOptions) {
+		o.MaxExportBatchSize = size
+	}
+}
+
+// WithBatchTimeout returns a BatchLogRecordProcessorOption that configures the
+// maximum delay allowed for a BatchLogRecordProcessor before it will export any
+// held log (whether the queue is full or not).
+func WithBatchTimeout(delay time.Duration) BatchLogRecordProcessorOption {
+	return func(o *BatchLogRecordProcessorOptions) {
+		o.BatchTimeout = delay
+	}
+}
+
+// WithExportTimeout returns a BatchLogRecordProcessorOption that configures the
+// amount of time a BatchLogRecordProcessor waits for an exporter to export before
+// abandoning the export.
+func WithExportTimeout(timeout time.Duration) BatchLogRecordProcessorOption {
+	return func(o *BatchLogRecordProcessorOptions) {
+		o.ExportTimeout = timeout
+	}
+}
+
+// WithBlocking returns a BatchLogRecordProcessorOption that configures a
+// BatchLogRecordProcessor to wait for enqueue operations to succeed instead of
+// dropping data when the queue is full.
+func WithBlocking() BatchLogRecordProcessorOption {
+	return func(o *BatchLogRecordProcessorOptions) {
+		o.BlockOnQueueFull = true
+	}
 }
 
 // batchLogRecordProcessor is a LogRecordProcessor that batches asynchronously-received
@@ -157,7 +200,7 @@ func NewBatchLogRecordProcessor(exporter LogRecordExporter, options ...BatchLogR
 }
 
 func (lrp batchLogRecordProcessor) OnEmit(rol ReadableLogRecord) {
-	// Do not enqueue spans if we are just going to drop them.
+	// Do not enqueue logs if we are just going to drop them.
 	if lrp.e == nil {
 		return
 	}
@@ -277,7 +320,7 @@ func (lrp *batchLogRecordProcessor) enqueue(sd ReadableLogRecord) {
 	}
 }
 
-// ForceFlush exports all ended spans that have not yet been exported.
+// ForceFlush exports all ended logs that have not yet been exported.
 func (lrp *batchLogRecordProcessor) ForceFlush(ctx context.Context) error {
 	var err error
 	if lrp.e != nil {
@@ -363,12 +406,12 @@ func (lrp *batchLogRecordProcessor) enqueueDrop(ctx context.Context, ld Readable
 // MarshalLog is the marshaling function used by the logging system to represent this exporter.
 func (lrp *batchLogRecordProcessor) MarshalLog() interface{} {
 	return struct {
-		Type         string
-		SpanExporter LogRecordExporter
-		Config       BatchLogRecordProcessorOptions
+		Type              string
+		LogRecordExporter LogRecordExporter
+		Config            BatchLogRecordProcessorOptions
 	}{
-		Type:         "BatchLogRecordProcessor",
-		SpanExporter: lrp.e,
-		Config:       lrp.o,
+		Type:              "BatchLogRecordProcessor",
+		LogRecordExporter: lrp.e,
+		Config:            lrp.o,
 	}
 }

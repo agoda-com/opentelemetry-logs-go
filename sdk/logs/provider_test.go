@@ -17,8 +17,7 @@ limitations under the License.
 package logs
 
 import (
-	"context"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/otlplogshttp"
+	//	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/otlplogshttp"
 	"github.com/agoda-com/opentelemetry-logs-go/logs"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
@@ -39,10 +38,10 @@ func TestLogsProvider(t *testing.T) {
 		logs.WithSchemaURL(semconv.SchemaURL),
 	)
 
-	logsOtlpExporter, _ := otlplogshttp.New(context.Background())
+	logRecordExporter := NewTestExporter()
 
 	batchOtlpLogger := NewLoggerProvider(
-		WithLogRecordProcessor(NewBatchLogRecordProcessor(logsOtlpExporter)),
+		WithLogRecordProcessor(NewBatchLogRecordProcessor(logRecordExporter)),
 		WithResource(
 			resource.NewWithAttributes(semconv.SchemaURL, semconv.ServiceName("unit_test"))),
 	).Logger("otlp",

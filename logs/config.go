@@ -21,7 +21,7 @@ import "go.opentelemetry.io/otel/attribute"
 // LoggerConfig is a group of options for a Logger.
 type LoggerConfig struct {
 	instrumentationVersion string
-	// Schema URL of the telemetry emitted by the Tracer.
+	// Schema URL of the telemetry emitted by the Logger.
 	schemaURL string
 	attrs     attribute.Set
 }
@@ -37,7 +37,7 @@ func (t *LoggerConfig) InstrumentationAttributes() attribute.Set {
 	return t.attrs
 }
 
-// SchemaURL returns the Schema URL of the telemetry emitted by the Tracer.
+// SchemaURL returns the Schema URL of the telemetry emitted by the Logger.
 func (t *LoggerConfig) SchemaURL() string {
 	return t.schemaURL
 }

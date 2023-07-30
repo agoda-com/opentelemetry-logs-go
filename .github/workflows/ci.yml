@@ -1,0 +1,36 @@
+name: ci
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+env:
+  # Path to where test results will be saved.
+  TEST_RESULTS: /tmp/test-results
+  # Default version of Go to use by CI workflows. This should be the latest
+  # release of Go; developers likely use the latest release in development and
+  # we want to catch any bugs (e.g. lint errors, race detection) with this
+  # release before they are merged. The Go compatibility guarantees ensure
+  # backwards compatibility with the previous two minor releases and we
+  # explicitly test our code for these versions so keeping this at prior
+  # versions does not add value.
+  DEFAULT_GO_VERSION: "1.20"
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Setup Environment
+        run: |
+          echo "GOPATH=$(go env GOPATH)" >> $GITHUB_ENV
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.DEFAULT_GO_VERSION }}
+          cache-dependency-path: "**/go.sum"
+      - name: Run coverage tests
+        run: |
+          make test-coverage

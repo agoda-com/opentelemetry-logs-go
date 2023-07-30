@@ -40,8 +40,8 @@ type LogRecordConfig struct {
 	Attributes           *[]attribute.KeyValue
 }
 
-// NewLogRecord constructs a SpanContext using values from the provided
-// SpanContextConfig.
+// NewLogRecord constructs a LogRecord using values from the provided
+// LogRecordConfig.
 func NewLogRecord(config LogRecordConfig) LogRecord {
 	return LogRecord{
 		timestamp:            config.Timestamp,
@@ -147,9 +147,9 @@ type LoggerProvider interface {
 	// therefore, the WithInstrumentationVersion option should be used to
 	// distinguish these different codebases. Additionally, instrumentation
 	// libraries may sometimes use traces to communicate different domains of
-	// workflow data (i.e. using spans to communicate workflow events only). If
+	// workflow data (i.e. using logs to communicate workflow events only). If
 	// this is the case, the WithScopeAttributes option should be used to
-	// uniquely identify Tracers that handle the different domains of workflow
+	// uniquely identify Loggers that handle the different domains of workflow
 	// data.
 	//
 	// If the same name and options are passed multiple times, the same Logger

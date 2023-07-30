@@ -69,8 +69,8 @@ func WithSyncer(e LogRecordExporter) LoggerProviderOption {
 	return WithLogRecordProcessor(NewSimpleLogRecordProcessor(e))
 }
 
-// WithBatcher registers the exporter with the TracerProvider using a
-// BatchSpanProcessor configured with the passed opts.
+// WithBatcher registers the exporter with the LoggerProvider using a
+// BatchLogRecordProcessor configured with the passed opts.
 func WithBatcher(e LogRecordExporter, opts ...BatchLogRecordProcessorOption) LoggerProviderOption {
 	return WithLogRecordProcessor(NewBatchLogRecordProcessor(e, opts...))
 }
@@ -160,13 +160,13 @@ var _ logs.LoggerProvider = &LoggerProvider{}
 func NewLoggerProvider(opts ...LoggerProviderOption) *LoggerProvider {
 	o := loggerProviderConfig{}
 
-	// TODO: o = applyLoggerProviderEnvConfigs(o)
+	o = applyLoggerProviderEnvConfigs(o)
 
 	for _, opt := range opts {
 		o = opt.apply(o)
 	}
 
-	// TODO: o = ensureValidLoggerProviderConfig(o)
+	o = ensureValidLoggerProviderConfig(o)
 
 	lp := &LoggerProvider{
 		namedLogger: make(map[instrumentation.Scope]*logger),
@@ -184,17 +184,6 @@ func NewLoggerProvider(opts ...LoggerProviderOption) *LoggerProvider {
 	return lp
 
 }
-
-//func (lp LoggerProvider) Send(rol ReadWriteLogRecord) {
-//
-//	// add resource level attributes
-//	rol.SetResource(lp.cfg.resource)
-//
-//	// process log
-//	for _, p := range lp.cfg.processors {
-//		p.OnEmit(rol)
-//	}
-//}
 
 func (p *LoggerProvider) getLogsProcessors() logRecordProcessorStates {
 	return *(p.logProcessors.Load())
@@ -239,7 +228,7 @@ func (p LoggerProvider) Shutdown(ctx context.Context) error {
 }
 
 // ForceFlush immediately exports all logs that have not yet been exported for
-// all the registered span processors.
+// all the registered log processors.
 func (p *LoggerProvider) ForceFlush(ctx context.Context) error {
 	spss := p.getLogsProcessors()
 	if len(spss) == 0 {
@@ -258,4 +247,27 @@ func (p *LoggerProvider) ForceFlush(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+func applyLoggerProviderEnvConfigs(cfg loggerProviderConfig) loggerProviderConfig {
+	for _, opt := range loggerProviderOptionsFromEnv() {
+		cfg = opt.apply(cfg)
+	}
+
+	return cfg
+}
+
+func loggerProviderOptionsFromEnv() []LoggerProviderOption {
+	var opts []LoggerProviderOption
+
+	return opts
+}
+
+// ensureValidLoggerProviderConfig ensures that given LoggerProviderConfig is valid.
+func ensureValidLoggerProviderConfig(cfg loggerProviderConfig) loggerProviderConfig {
+
+	if cfg.resource == nil {
+		cfg.resource = resource.Default()
+	}
+	return cfg
 }

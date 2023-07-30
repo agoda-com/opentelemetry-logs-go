@@ -48,7 +48,7 @@ a default.
 	)
 
 	type Instrumentation struct {
-		tracer logging.Logger
+		logger logging.Logger
 	}
 
 	func NewInstrumentation(tp logging.LoggerProvider) *Instrumentation {
