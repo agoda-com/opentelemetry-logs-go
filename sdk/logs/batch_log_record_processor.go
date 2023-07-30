@@ -68,6 +68,49 @@ type BatchLogRecordProcessorOptions struct {
 	BlockOnQueueFull bool
 }
 
+// WithMaxQueueSize returns a BatchLogRecordProcessorOption that configures the
+// maximum queue size allowed for a BatchLogRecordProcessor.
+func WithMaxQueueSize(size int) BatchLogRecordProcessorOption {
+	return func(o *BatchLogRecordProcessorOptions) {
+		o.MaxQueueSize = size
+	}
+}
+
+// WithMaxExportBatchSize returns a BatchLogRecordProcessorOption that configures
+// the maximum export batch size allowed for a BatchLogRecordProcessor.
+func WithMaxExportBatchSize(size int) BatchLogRecordProcessorOption {
+	return func(o *BatchLogRecordProcessorOptions) {
+		o.MaxExportBatchSize = size
+	}
+}
+
+// WithBatchTimeout returns a BatchLogRecordProcessorOption that configures the
+// maximum delay allowed for a BatchLogRecordProcessor before it will export any
+// held log (whether the queue is full or not).
+func WithBatchTimeout(delay time.Duration) BatchLogRecordProcessorOption {
+	return func(o *BatchLogRecordProcessorOptions) {
+		o.BatchTimeout = delay
+	}
+}
+
+// WithExportTimeout returns a BatchLogRecordProcessorOption that configures the
+// amount of time a BatchLogRecordProcessor waits for an exporter to export before
+// abandoning the export.
+func WithExportTimeout(timeout time.Duration) BatchLogRecordProcessorOption {
+	return func(o *BatchLogRecordProcessorOptions) {
+		o.ExportTimeout = timeout
+	}
+}
+
+// WithBlocking returns a BatchLogRecordProcessorOption that configures a
+// BatchLogRecordProcessor to wait for enqueue operations to succeed instead of
+// dropping data when the queue is full.
+func WithBlocking() BatchLogRecordProcessorOption {
+	return func(o *BatchLogRecordProcessorOptions) {
+		o.BlockOnQueueFull = true
+	}
+}
+
 // batchLogRecordProcessor is a LogRecordProcessor that batches asynchronously-received
 // logs and sends them to a logs.Exporter when complete.
 type batchLogRecordProcessor struct {

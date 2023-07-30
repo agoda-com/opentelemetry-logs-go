@@ -20,8 +20,8 @@ func RunEndToEndTest(ctx context.Context, t *testing.T, exp *otlplogs.Exporter, 
 		sdklogs.WithBatcher(
 			exp,
 			// add following two options to ensure flush
-			//sdklogs.WithBatchTimeout(5*time.Second),
-			//	sdklogs.WithMaxExportBatchSize(10),
+			sdklogs.WithBatchTimeout(5*time.Second),
+			sdklogs.WithMaxExportBatchSize(10),
 		),
 	}
 	tp1 := sdklogs.NewLoggerProvider(append(pOpts,
