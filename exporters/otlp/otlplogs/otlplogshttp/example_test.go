@@ -20,6 +20,7 @@ import (
 	"context"
 	"github.com/agoda-com/opentelemetry-logs-go"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
+
 	"github.com/agoda-com/opentelemetry-logs-go/logs"
 	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -49,11 +50,14 @@ func doSomething() {
 		logs.WithSchemaURL(semconv.SchemaURL),
 	)
 
-	body := "Body"
+	body := "My message"
 	now := time.Now()
+	sn := logs.INFO
 	cfg := logs.LogRecordConfig{
-		Timestamp: &now,
-		Body:      &body,
+		Timestamp:         &now,
+		ObservedTimestamp: now,
+		Body:              &body,
+		SeverityNumber:    &sn,
 	}
 	logRecord := logs.NewLogRecord(cfg)
 	logger.Emit(logRecord)

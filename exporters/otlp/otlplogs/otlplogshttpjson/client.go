@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package otlplogshttp
+package otlplogshttpjson
 
 import (
 	"bytes"
@@ -25,7 +25,7 @@ import (
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
-	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/jsonpb"
 	"go.opentelemetry.io/otel"
 	collogspb "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 	logspb "go.opentelemetry.io/proto/otlp/logs/v1"
@@ -38,7 +38,7 @@ import (
 	"time"
 )
 
-const contentTypeProto = "application/x-protobuf"
+const contentTypeJson = "application/json"
 
 var gzPool = sync.Pool{
 	New: func() interface{} {
@@ -72,6 +72,7 @@ type client struct {
 	client      *http.Client
 	stopCh      chan struct{}
 	stopOnce    sync.Once
+	marshaller  jsonpb.Marshaler
 }
 
 var _ otlplogs.Client = (*client)(nil)
@@ -98,6 +99,7 @@ func NewClient(opts ...Option) otlplogs.Client {
 		requestFunc: cfg.RetryConfig.RequestFunc(evaluate),
 		stopCh:      stopCh,
 		client:      httpClient,
+		marshaller:  jsonpb.Marshaler{OrigName: true},
 	}
 }
 
@@ -173,7 +175,7 @@ func (d *client) newRequest(body []byte) (request, error) {
 	for k, v := range d.cfg.Headers {
 		r.Header.Set(k, v)
 	}
-	r.Header.Set("Content-Type", contentTypeProto)
+	r.Header.Set("Content-Type", contentTypeJson)
 
 	req := request{Request: r}
 	switch Compression(d.cfg.Compression) {
@@ -255,13 +257,13 @@ func (d *client) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLog
 	exportLogs := &collogspb.ExportLogsServiceRequest{
 		ResourceLogs: protoLogs,
 	}
-	// Serialize the OTLP logs payload
-	rawRequest, _ := proto.Marshal(exportLogs)
 
+	// Serialize the OTLP logs payload
+	rawRequest, _ := d.marshaller.MarshalToString(exportLogs)
 	ctx, cancel := d.contextWithStop(ctx)
 	defer cancel()
 
-	request, err := d.newRequest(rawRequest)
+	request, err := d.newRequest([]byte(rawRequest))
 	if err != nil {
 		return err
 	}
@@ -297,16 +299,16 @@ func (d *client) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLog
 			}
 
 			if respData.Len() != 0 {
-				var respProto collogspb.ExportLogsServiceResponse
-				if err := proto.Unmarshal(respData.Bytes(), &respProto); err != nil {
+				var response collogspb.ExportLogsServiceResponse
+				if err := jsonpb.UnmarshalString(respData.String(), &response); err != nil {
 					return err
 				}
 
 				// TODO: partialsuccess can't be handled properly by OTEL as current otlp.internal.PartialSuccess is custom
 				// need to have that interface in official OTEL otlp.internal package
-				if respProto.PartialSuccess != nil {
-					msg := respProto.PartialSuccess.GetErrorMessage()
-					n := respProto.PartialSuccess.GetRejectedLogRecords()
+				if response.PartialSuccess != nil {
+					msg := response.PartialSuccess.GetErrorMessage()
+					n := response.PartialSuccess.GetRejectedLogRecords()
 					if n != 0 || msg != "" {
 						err := internal.LogRecordPartialSuccessError(n, msg)
 						otel.Handle(err)
@@ -334,7 +336,7 @@ func (d *client) MarshalLog() interface{} {
 		Endpoint string
 		Insecure bool
 	}{
-		Type:     "otlphttphttp",
+		Type:     "otlphttphttpjson",
 		Endpoint: d.cfg.Endpoint,
 		Insecure: d.cfg.Insecure,
 	}
