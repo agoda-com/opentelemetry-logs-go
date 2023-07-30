@@ -20,12 +20,12 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"encoding/json"
 	"fmt"
 	internal "github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
+	"github.com/golang/protobuf/jsonpb"
 	"go.opentelemetry.io/otel"
 	collogspb "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 	logspb "go.opentelemetry.io/proto/otlp/logs/v1"
@@ -72,6 +72,7 @@ type client struct {
 	client      *http.Client
 	stopCh      chan struct{}
 	stopOnce    sync.Once
+	marshaller  jsonpb.Marshaler
 }
 
 var _ otlplogs.Client = (*client)(nil)
@@ -98,6 +99,7 @@ func NewClient(opts ...Option) otlplogs.Client {
 		requestFunc: cfg.RetryConfig.RequestFunc(evaluate),
 		stopCh:      stopCh,
 		client:      httpClient,
+		marshaller:  jsonpb.Marshaler{OrigName: true},
 	}
 }
 
@@ -255,13 +257,13 @@ func (d *client) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLog
 	exportLogs := &collogspb.ExportLogsServiceRequest{
 		ResourceLogs: protoLogs,
 	}
-	// Serialize the OTLP logs payload
-	rawRequest, _ := json.Marshal(exportLogs)
 
+	// Serialize the OTLP logs payload
+	rawRequest, _ := d.marshaller.MarshalToString(exportLogs)
 	ctx, cancel := d.contextWithStop(ctx)
 	defer cancel()
 
-	request, err := d.newRequest(rawRequest)
+	request, err := d.newRequest([]byte(rawRequest))
 	if err != nil {
 		return err
 	}
@@ -298,7 +300,7 @@ func (d *client) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLog
 
 			if respData.Len() != 0 {
 				var response collogspb.ExportLogsServiceResponse
-				if err := json.Unmarshal(respData.Bytes(), &response); err != nil {
+				if err := jsonpb.UnmarshalString(respData.String(), &response); err != nil {
 					return err
 				}
 
