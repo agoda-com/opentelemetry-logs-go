@@ -19,6 +19,7 @@ package otlplogs
 import (
 	"context"
 	"errors"
+	"expvar"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/logstransform"
 	logssdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 	"sync"
@@ -95,4 +96,13 @@ func New(ctx context.Context, client Client) (*Exporter, error) {
 		return nil, err
 	}
 	return exp, nil
+}
+
+// NewAutoconfigured creates new Exporter with auto-configured client
+// this method subject to change
+func NewAutoconfigured(ctx context.Context) (*Exporter, error) {
+	// Create new client using env variables
+	var client Client = ..
+
+	return New(ctx, client)
 }
