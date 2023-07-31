@@ -34,6 +34,34 @@ var DefaultEnvOptionsReader = envconfig.EnvOptionsReader{
 	Namespace: "OTEL_EXPORTER_OTLP",
 }
 
+func stringToProtocol(u string) Protocol {
+	switch strings.ToLower(u) {
+	case string(ExporterProtocolGrpc):
+		return ExporterProtocolGrpc
+	case string(ExporterProtocolHttpProtobuf):
+		return ExporterProtocolHttpProtobuf
+	case string(ExporterProtocolHttpJson):
+		return ExporterProtocolHttpJson
+	default:
+		return ExporterProtocolHttpProtobuf
+	}
+}
+
+// ApplyEnvProtocol Apply Protocol from environment to provided default value
+// This function is subject to change or removal in future versions.
+func ApplyEnvProtocol(protocol Protocol) Protocol {
+	DefaultEnvOptionsReader.Apply(
+		envconfig.WithString("PROTOCOL", func(s string) {
+			protocol = stringToProtocol(s)
+		}),
+		envconfig.WithString("LOGS_PROTOCOL", func(s string) {
+			protocol = stringToProtocol(s)
+		}),
+	)
+
+	return protocol
+}
+
 // ApplyGRPCEnvConfigs applies the env configurations for gRPC.
 func ApplyGRPCEnvConfigs(cfg Config) Config {
 	opts := getOptionsFromEnv()
@@ -85,9 +113,9 @@ func getOptionsFromEnv() []GenericOption {
 			}, withEndpointForGRPC(u)))
 		}),
 		envconfig.WithCertPool("CERTIFICATE", func(p *x509.CertPool) { tlsConf.RootCAs = p }),
-		envconfig.WithCertPool("TRACES_CERTIFICATE", func(p *x509.CertPool) { tlsConf.RootCAs = p }),
+		envconfig.WithCertPool("LOGS_CERTIFICATE", func(p *x509.CertPool) { tlsConf.RootCAs = p }),
 		envconfig.WithClientCert("CLIENT_CERTIFICATE", "CLIENT_KEY", func(c tls.Certificate) { tlsConf.Certificates = []tls.Certificate{c} }),
-		envconfig.WithClientCert("TRACES_CLIENT_CERTIFICATE", "TRACES_CLIENT_KEY", func(c tls.Certificate) { tlsConf.Certificates = []tls.Certificate{c} }),
+		envconfig.WithClientCert("LOGS_CLIENT_CERTIFICATE", "LOGS_CLIENT_KEY", func(c tls.Certificate) { tlsConf.Certificates = []tls.Certificate{c} }),
 		withTLSConfig(tlsConf, func(c *tls.Config) { opts = append(opts, WithTLSClientConfig(c)) }),
 		envconfig.WithBool("INSECURE", func(b bool) { opts = append(opts, withInsecure(b)) }),
 		envconfig.WithBool("LOGS_INSECURE", func(b bool) { opts = append(opts, withInsecure(b)) }),
@@ -96,7 +124,7 @@ func getOptionsFromEnv() []GenericOption {
 		WithEnvCompression("COMPRESSION", func(c Compression) { opts = append(opts, WithCompression(c)) }),
 		WithEnvCompression("LOGS_COMPRESSION", func(c Compression) { opts = append(opts, WithCompression(c)) }),
 		envconfig.WithDuration("TIMEOUT", func(d time.Duration) { opts = append(opts, WithTimeout(d)) }),
-		envconfig.WithDuration("TRACES_TIMEOUT", func(d time.Duration) { opts = append(opts, WithTimeout(d)) }),
+		envconfig.WithDuration("LOGS_TIMEOUT", func(d time.Duration) { opts = append(opts, WithTimeout(d)) }),
 	)
 
 	return opts

@@ -19,7 +19,6 @@ package otlplogs
 import (
 	"context"
 	"errors"
-	"expvar"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/logstransform"
 	logssdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 	"sync"
@@ -87,8 +86,7 @@ func (e *Exporter) Export(ctx context.Context, ll []logssdk.ReadableLogRecord) e
 	return nil
 }
 
-// New creates new Exporter with provided client
-func New(ctx context.Context, client Client) (*Exporter, error) {
+func newWithClient(ctx context.Context, client Client) (*Exporter, error) {
 	exp := &Exporter{
 		client: client,
 	}
@@ -98,11 +96,15 @@ func New(ctx context.Context, client Client) (*Exporter, error) {
 	return exp, nil
 }
 
-// NewAutoconfigured creates new Exporter with auto-configured client
+// New creates new Exporter
 // this method subject to change
-func NewAutoconfigured(ctx context.Context) (*Exporter, error) {
+func New(ctx context.Context, options ...ExporterOption) (*Exporter, error) {
 	// Create new client using env variables
-	var client Client = ..
+	config := NewExporterConfig(options...)
 
-	return New(ctx, client)
+	for _, opt := range options {
+		config = opt.apply(config)
+	}
+
+	return newWithClient(ctx, config.client)
 }
