@@ -18,9 +18,6 @@ package otlplogs
 
 import (
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/otlplogsgrpc"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/otlplogshttp"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/otlplogshttpjson"
 )
 
 type ExporterConfig struct {
@@ -44,15 +41,7 @@ func NewExporterConfig(options ...ExporterOption) ExporterConfig {
 	protocol := otlpconfig.ApplyEnvProtocol(otlpconfig.ExporterProtocolHttpProtobuf)
 
 	// workaround to create default client and apply configured by env variable
-	var client Client
-	switch protocol {
-	case otlpconfig.ExporterProtocolHttpJson:
-		client = otlplogshttpjson.NewClient()
-	case otlpconfig.ExporterProtocolGrpc:
-		client = otlplogsgrpc.NewClient()
-	case otlpconfig.ExporterProtocolHttpProtobuf:
-		client = otlplogshttp.NewClient()
-	}
+	client := Clients[protocol]
 
 	config := ExporterConfig{
 		client: client,

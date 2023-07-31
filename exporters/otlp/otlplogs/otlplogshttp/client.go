@@ -339,3 +339,7 @@ func (d *client) MarshalLog() interface{} {
 		Insecure: d.cfg.Insecure,
 	}
 }
+
+func init() {
+	otlplogs.Clients[otlpconfig.ExporterProtocolHttpProtobuf] = NewClient()
+}

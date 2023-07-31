@@ -299,3 +299,7 @@ func (c *client) MarshalLog() interface{} {
 		Endpoint: c.endpoint,
 	}
 }
+
+func init() {
+	otlplogs.Clients[otlpconfig.ExporterProtocolGrpc] = NewClient()
+}
