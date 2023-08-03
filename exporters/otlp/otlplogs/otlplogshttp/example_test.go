@@ -20,8 +20,6 @@ import (
 	"context"
 	"github.com/agoda-com/opentelemetry-logs-go"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
-	"testing"
-
 	"github.com/agoda-com/opentelemetry-logs-go/logs"
 	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -66,8 +64,8 @@ func doSomething() {
 }
 
 func installExportPipeline(ctx context.Context) (func(context.Context) error, error) {
-	//client := NewClient()
-	exporter, _ := otlplogs.New(ctx) //, otlplogs.WithClient(client))
+	client := NewClient()
+	exporter, _ := otlplogs.NewExporter(ctx, otlplogs.WithClient(client))
 
 	loggerProvider := sdk.NewLoggerProvider(
 		sdk.WithBatcher(exporter),
@@ -78,7 +76,7 @@ func installExportPipeline(ctx context.Context) (func(context.Context) error, er
 	return loggerProvider.Shutdown, nil
 }
 
-func TestExample(t *testing.T) {
+func Example() {
 	{
 		ctx := context.Background()
 		// Registers a logger Provider globally.

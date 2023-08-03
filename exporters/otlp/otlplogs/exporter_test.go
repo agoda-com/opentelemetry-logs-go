@@ -33,7 +33,7 @@ func (c *client) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLog
 
 func TestExporterClientError(t *testing.T) {
 	ctx := context.Background()
-	exp, err := otlplogs.New(ctx, otlplogs.WithClient(&client{
+	exp, err := otlplogs.NewExporter(ctx, otlplogs.WithClient(&client{
 		uploadErr: context.Canceled,
 	}))
 	assert.NoError(t, err)

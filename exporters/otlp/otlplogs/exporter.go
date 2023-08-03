@@ -86,19 +86,14 @@ func (e *Exporter) Export(ctx context.Context, ll []logssdk.ReadableLogRecord) e
 	return nil
 }
 
-func newWithClient(ctx context.Context, client Client) (*Exporter, error) {
-	exp := &Exporter{
-		client: client,
-	}
-	if err := exp.Start(ctx); err != nil {
-		return nil, err
-	}
-	return exp, nil
+// New creates new exporter with client
+// Deprecated: Use NewExporter instead. Will be removed in v0.1.0
+func New(ctx context.Context, client Client) (*Exporter, error) {
+	return NewExporter(ctx, WithClient(client))
 }
 
-// New creates new Exporter
-// this method subject to change
-func New(ctx context.Context, options ...ExporterOption) (*Exporter, error) {
+// NewExporter creates new Exporter
+func NewExporter(ctx context.Context, options ...ExporterOption) (*Exporter, error) {
 	// Create new client using env variables
 	config := NewExporterConfig(options...)
 
@@ -106,5 +101,12 @@ func New(ctx context.Context, options ...ExporterOption) (*Exporter, error) {
 		config = opt.apply(config)
 	}
 
-	return newWithClient(ctx, config.client)
+	exp := &Exporter{
+		client: config.client,
+	}
+
+	if err := exp.Start(ctx); err != nil {
+		return nil, err
+	}
+	return exp, nil
 }

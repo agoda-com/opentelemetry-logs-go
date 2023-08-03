@@ -23,5 +23,5 @@ import (
 
 // New constructs a new Exporter and starts it.
 func New(ctx context.Context) (*otlplogs.Exporter, error) {
-	return otlplogs.New(ctx, otlplogs.WithClient(NewClient()))
+	return otlplogs.NewExporter(ctx, otlplogs.WithClient(NewClient()))
 }

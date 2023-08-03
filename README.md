@@ -84,7 +84,7 @@ func newResource() *resource.Resource {
 func main() {
 	ctx := context.Background()
 
-	exporter, _ := otlplogs.New(ctx, otlplogs.WithClient(otlplogshttp.NewClient()))
+	exporter, _ := otlplogs.NewExporter(ctx, otlplogs.WithClient(otlplogshttp.NewClient()))
 	loggerProvider := sdk.NewLoggerProvider(
 		sdk.WithBatcher(exporter),
 		sdk.WithResource(newResource()),
