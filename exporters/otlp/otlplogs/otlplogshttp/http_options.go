@@ -36,12 +36,12 @@ const (
 	GzipCompression = Compression(otlpconfig.GzipCompression)
 )
 
-// Option applies an option to the HTTP client.
-type Option interface {
+// HttpOption applies an option to the HTTP httpClient.
+type HttpOption interface {
 	applyHTTPOption(otlpconfig.Config) otlpconfig.Config
 }
 
-func asHTTPOptions(opts []Option) []otlpconfig.HTTPOption {
+func asHTTPOptions(opts []HttpOption) []otlpconfig.HTTPOption {
 	converted := make([]otlpconfig.HTTPOption, len(opts))
 	for i, o := range opts {
 		converted[i] = otlpconfig.NewHTTPOption(o.applyHTTPOption)
@@ -66,44 +66,52 @@ func (w wrappedOption) applyHTTPOption(cfg otlpconfig.Config) otlpconfig.Config 
 // unset, it will instead try to use
 // the default endpoint (localhost:4318). Note that the endpoint
 // must not contain any URL path.
-func WithEndpoint(endpoint string) Option {
+func WithEndpoint(endpoint string) HttpOption {
 	return wrappedOption{otlpconfig.WithEndpoint(endpoint)}
 }
 
+func WithJsonProtocol() HttpOption {
+	return wrappedOption{otlpconfig.WithProtocol(otlpconfig.ExporterProtocolHttpJson)}
+}
+
+func WithProtobufProtocol() HttpOption {
+	return wrappedOption{otlpconfig.WithProtocol(otlpconfig.ExporterProtocolHttpProtobuf)}
+}
+
 // WithCompression tells the driver to compress the sent data.
-func WithCompression(compression Compression) Option {
+func WithCompression(compression Compression) HttpOption {
 	return wrappedOption{otlpconfig.WithCompression(otlpconfig.Compression(compression))}
 }
 
 // WithURLPath allows one to override the default URL path used
 // for sending logs. If unset, default ("/v1/logs") will be used.
-func WithURLPath(urlPath string) Option {
+func WithURLPath(urlPath string) HttpOption {
 	return wrappedOption{otlpconfig.WithURLPath(urlPath)}
 }
 
 // WithTLSClientConfig can be used to set up a custom TLS
-// configuration for the client used to send payloads to the
+// configuration for the httpClient used to send payloads to the
 // collector. Use it if you want to use a custom certificate.
-func WithTLSClientConfig(tlsCfg *tls.Config) Option {
+func WithTLSClientConfig(tlsCfg *tls.Config) HttpOption {
 	return wrappedOption{otlpconfig.WithTLSClientConfig(tlsCfg)}
 }
 
 // WithInsecure tells the driver to connect to the collector using the
 // HTTP scheme, instead of HTTPS.
-func WithInsecure() Option {
+func WithInsecure() HttpOption {
 	return wrappedOption{otlpconfig.WithInsecure()}
 }
 
 // WithHeaders allows one to tell the driver to send additional HTTP
 // headers with the payloads. Specifying headers like Content-Length,
 // Content-Encoding and Content-Type may result in a broken driver.
-func WithHeaders(headers map[string]string) Option {
+func WithHeaders(headers map[string]string) HttpOption {
 	return wrappedOption{otlpconfig.WithHeaders(headers)}
 }
 
 // WithTimeout tells the driver the max waiting time for the backend to process
 // each logs batch.  If unset, the default will be 10 seconds.
-func WithTimeout(duration time.Duration) Option {
+func WithTimeout(duration time.Duration) HttpOption {
 	return wrappedOption{otlpconfig.WithTimeout(duration)}
 }
 
@@ -112,6 +120,6 @@ func WithTimeout(duration time.Duration) Option {
 // endpoints are not overwhelmed with retries. If unset, the default retry
 // policy will retry after 5 seconds and increase exponentially after each
 // error for a total of 1 minute.
-func WithRetry(rc RetryConfig) Option {
+func WithRetry(rc RetryConfig) HttpOption {
 	return wrappedOption{otlpconfig.WithRetry(retry.Config(rc))}
 }

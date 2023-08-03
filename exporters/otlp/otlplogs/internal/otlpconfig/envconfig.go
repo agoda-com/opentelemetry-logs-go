@@ -112,6 +112,12 @@ func getOptionsFromEnv() []GenericOption {
 				return cfg
 			}, withEndpointForGRPC(u)))
 		}),
+		envconfig.WithString("PROTOCOL", func(s string) {
+			opts = append(opts, withProtocol(s))
+		}),
+		envconfig.WithString("LOGS_PROTOCOL", func(s string) {
+			opts = append(opts, withProtocol(s))
+		}),
 		envconfig.WithCertPool("CERTIFICATE", func(p *x509.CertPool) { tlsConf.RootCAs = p }),
 		envconfig.WithCertPool("LOGS_CERTIFICATE", func(p *x509.CertPool) { tlsConf.RootCAs = p }),
 		envconfig.WithClientCert("CLIENT_CERTIFICATE", "CLIENT_KEY", func(c tls.Certificate) { tlsConf.Certificates = []tls.Certificate{c} }),
@@ -176,4 +182,11 @@ func withTLSConfig(c *tls.Config, fn func(*tls.Config)) func(e *envconfig.EnvOpt
 			fn(c)
 		}
 	}
+}
+
+func withProtocol(b string) GenericOption {
+	return newGenericOption(func(cfg Config) Config {
+		cfg.Logs.Protocol = stringToProtocol(b)
+		return cfg
+	})
 }

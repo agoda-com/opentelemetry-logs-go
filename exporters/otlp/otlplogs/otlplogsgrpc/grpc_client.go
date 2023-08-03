@@ -38,7 +38,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type client struct {
+type grpcClient struct {
 	endpoint      string
 	dialOpts      []grpc.DialOption
 	metadata      metadata.MD
@@ -61,20 +61,20 @@ type client struct {
 	tsc     collogspb.LogsServiceClient
 }
 
-// Compile time check *client implements otlplogs.Client.
-var _ otlplogs.Client = (*client)(nil)
+// Compile time check *grpcClient implements otlplogs.Client.
+var _ otlplogs.Client = (*grpcClient)(nil)
 
-// NewClient creates a new gRPC logs client.
-func NewClient(opts ...Option) otlplogs.Client {
+// NewClient creates a new gRPC logs grpcClient.
+func NewClient(opts ...GrpcOption) otlplogs.Client {
 	return newClient(opts...)
 }
 
-func newClient(opts ...Option) *client {
+func newClient(opts ...GrpcOption) *grpcClient {
 	cfg := otlpconfig.NewGRPCConfig(asGRPCOptions(opts)...)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	c := &client{
+	c := &grpcClient{
 		endpoint:      cfg.Logs.Endpoint,
 		exportTimeout: cfg.Logs.Timeout,
 		requestFunc:   cfg.RetryConfig.RequestFunc(retryable),
@@ -92,9 +92,9 @@ func newClient(opts ...Option) *client {
 }
 
 // Start establishes a gRPC connection to the collector.
-func (c *client) Start(ctx context.Context) error {
+func (c *grpcClient) Start(ctx context.Context) error {
 	if c.conn == nil {
-		// If the caller did not provide a ClientConn when the client was
+		// If the caller did not provide a ClientConn when the grpcClient was
 		// created, create one using the configuration they did provide.
 		conn, err := grpc.DialContext(ctx, c.endpoint, c.dialOpts...)
 		if err != nil {
@@ -115,24 +115,24 @@ func (c *client) Start(ctx context.Context) error {
 	return nil
 }
 
-var errAlreadyStopped = errors.New("the client is already stopped")
+var errAlreadyStopped = errors.New("the grpcClient is already stopped")
 
-// Stop shuts down the client.
+// Stop shuts down the grpcClient.
 //
 // Any active connections to a remote endpoint are closed if they were created
-// by the client. Any gRPC connection passed during creation using
+// by the grpcClient. Any gRPC connection passed during creation using
 // WithGRPCConn will not be closed. It is the caller's responsibility to
 // handle cleanup of that resource.
 //
-// This method synchronizes with the UploadLogs method of the client. It
+// This method synchronizes with the UploadLogs method of the grpcClient. It
 // will wait for any active calls to that method to complete unimpeded, or it
 // will cancel any active calls if ctx expires. If ctx expires, the context
-// error will be forwarded as the returned error. All client held resources
+// error will be forwarded as the returned error. All grpcClient held resources
 // will still be released in this situation.
 //
-// If the client has already stopped, an error will be returned describing
+// If the grpcClient has already stopped, an error will be returned describing
 // this.
-func (c *client) Stop(ctx context.Context) error {
+func (c *grpcClient) Stop(ctx context.Context) error {
 	// Make sure to return context error if the context is done when calling this method.
 	err := ctx.Err()
 
@@ -151,7 +151,7 @@ func (c *client) Stop(ctx context.Context) error {
 		c.stopFunc()
 		err = ctx.Err()
 
-		// To ensure the client is not left in a dirty state c.tsc needs to be
+		// To ensure the grpcClient is not left in a dirty state c.tsc needs to be
 		// set to nil. To avoid the race condition when doing this, ensure
 		// that all the exports are killed (initiated by c.stopFunc).
 		<-acquired
@@ -163,13 +163,13 @@ func (c *client) Stop(ctx context.Context) error {
 
 	// The otlplogs.Client interface states this method is called only
 	// once, but there is no guarantee it is called after Start. Ensure the
-	// client is started before doing anything and let the called know if they
+	// grpcClient is started before doing anything and let the called know if they
 	// made a mistake.
 	if c.tsc == nil {
 		return errAlreadyStopped
 	}
 
-	// Clear c.tsc to signal the client is stopped.
+	// Clear c.tsc to signal the grpcClient is stopped.
 	c.tsc = nil
 
 	if c.ourConn {
@@ -182,16 +182,16 @@ func (c *client) Stop(ctx context.Context) error {
 	return err
 }
 
-var errShutdown = errors.New("the client is shutdown")
+var errShutdown = errors.New("the grpcClient is shutdown")
 
 // UploadLogs sends log records.
 //
 // Retryable errors from the server will be handled according to any
-// RetryConfig the client was created with.
-func (c *client) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLogs) error {
+// RetryConfig the grpcClient was created with.
+func (c *grpcClient) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLogs) error {
 	// Hold a read lock to ensure a shut down initiated after this starts does
 	// not abandon the export. This read lock acquire has less priority than a
-	// write lock acquire (i.e. Stop), meaning if the client is shutting down
+	// write lock acquire (i.e. Stop), meaning if the grpcClient is shutting down
 	// this will come after the shut down.
 	c.tscMu.RLock()
 	defer c.tscMu.RUnlock()
@@ -230,7 +230,7 @@ func (c *client) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLog
 // It is the callers responsibility to cancel the returned context once its
 // use is complete, via the parent or directly with the returned CancelFunc, to
 // ensure all resources are correctly released.
-func (c *client) exportContext(parent context.Context) (context.Context, context.CancelFunc) {
+func (c *grpcClient) exportContext(parent context.Context) (context.Context, context.CancelFunc) {
 	var (
 		ctx    context.Context
 		cancel context.CancelFunc
@@ -246,7 +246,7 @@ func (c *client) exportContext(parent context.Context) (context.Context, context
 		ctx = metadata.NewOutgoingContext(ctx, c.metadata)
 	}
 
-	// Unify the client stopCtx with the parent.
+	// Unify the grpcClient stopCtx with the parent.
 	go func() {
 		select {
 		case <-ctx.Done():
@@ -290,7 +290,7 @@ func throttleDelay(s *status.Status) time.Duration {
 }
 
 // MarshalLog is the marshaling function used by the logging system to represent this Client.
-func (c *client) MarshalLog() interface{} {
+func (c *grpcClient) MarshalLog() interface{} {
 	return struct {
 		Type     string
 		Endpoint string

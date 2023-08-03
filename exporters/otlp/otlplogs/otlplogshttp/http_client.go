@@ -25,6 +25,7 @@ import (
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"go.opentelemetry.io/otel"
 	collogspb "go.opentelemetry.io/proto/otlp/collector/logs/v1"
@@ -39,6 +40,7 @@ import (
 )
 
 const contentTypeProto = "application/x-protobuf"
+const contentTypeJson = "application/json"
 
 var gzPool = sync.Pool{
 	New: func() interface{} {
@@ -64,7 +66,7 @@ var ourTransport = &http.Transport{
 	ExpectContinueTimeout: 1 * time.Second,
 }
 
-type client struct {
+type httpClient struct {
 	name        string
 	cfg         otlpconfig.SignalConfig
 	generalCfg  otlpconfig.Config
@@ -72,37 +74,44 @@ type client struct {
 	client      *http.Client
 	stopCh      chan struct{}
 	stopOnce    sync.Once
+	marshaller  jsonpb.Marshaler
 }
 
-var _ otlplogs.Client = (*client)(nil)
+var _ otlplogs.Client = (*httpClient)(nil)
 
-// NewClient creates a new HTTP logs client.
-func NewClient(opts ...Option) otlplogs.Client {
+// NewClient creates a new HTTP logs httpClient.
+func NewClient(opts ...HttpOption) otlplogs.Client {
+
 	cfg := otlpconfig.NewHTTPConfig(asHTTPOptions(opts)...)
 
-	httpClient := &http.Client{
+	// Fix Protocol to Default if incorrect one was provided
+	if cfg.Logs.Protocol != otlpconfig.ExporterProtocolHttpJson && cfg.Logs.Protocol != otlpconfig.ExporterProtocolHttpProtobuf {
+		cfg.Logs.Protocol = otlpconfig.ExporterProtocolHttpProtobuf
+	}
+
+	client := &http.Client{
 		Transport: ourTransport,
 		Timeout:   cfg.Logs.Timeout,
 	}
 	if cfg.Logs.TLSCfg != nil {
 		transport := ourTransport.Clone()
 		transport.TLSClientConfig = cfg.Logs.TLSCfg
-		httpClient.Transport = transport
+		client.Transport = transport
 	}
 
 	stopCh := make(chan struct{})
-	return &client{
+	return &httpClient{
 		name:        "logs",
 		cfg:         cfg.Logs,
 		generalCfg:  cfg,
 		requestFunc: cfg.RetryConfig.RequestFunc(evaluate),
 		stopCh:      stopCh,
-		client:      httpClient,
+		client:      client,
 	}
 }
 
-// Start does nothing in a HTTP client.
-func (d *client) Start(ctx context.Context) error {
+// Start does nothing in a HTTP httpClient.
+func (d *httpClient) Start(ctx context.Context) error {
 	// nothing to do
 	select {
 	case <-ctx.Done():
@@ -112,8 +121,8 @@ func (d *client) Start(ctx context.Context) error {
 	return nil
 }
 
-// Stop shuts down the client and interrupt any in-flight request.
-func (d *client) Stop(ctx context.Context) error {
+// Stop shuts down the httpClient and interrupt any in-flight request.
+func (d *httpClient) Stop(ctx context.Context) error {
 	d.stopOnce.Do(func() {
 		close(d.stopCh)
 	})
@@ -145,8 +154,8 @@ func evaluate(err error) (bool, time.Duration) {
 	return true, time.Duration(rErr.throttle)
 }
 
-func (d *client) contextWithStop(ctx context.Context) (context.Context, context.CancelFunc) {
-	// Unify the parent context Done signal with the client's stop
+func (d *httpClient) contextWithStop(ctx context.Context) (context.Context, context.CancelFunc) {
+	// Unify the parent context Done signal with the httpClient's stop
 	// channel.
 	ctx, cancel := context.WithCancel(ctx)
 	go func(ctx context.Context, cancel context.CancelFunc) {
@@ -161,7 +170,7 @@ func (d *client) contextWithStop(ctx context.Context) (context.Context, context.
 	return ctx, cancel
 }
 
-func (d *client) newRequest(body []byte) (request, error) {
+func (d *httpClient) newRequest(body []byte) (request, error) {
 	u := url.URL{Scheme: d.getScheme(), Host: d.cfg.Endpoint, Path: d.cfg.URLPath}
 	r, err := http.NewRequest(http.MethodPost, u.String(), nil)
 	if err != nil {
@@ -173,7 +182,12 @@ func (d *client) newRequest(body []byte) (request, error) {
 	for k, v := range d.cfg.Headers {
 		r.Header.Set(k, v)
 	}
-	r.Header.Set("Content-Type", contentTypeProto)
+	switch d.cfg.Protocol {
+	case otlpconfig.ExporterProtocolHttpJson:
+		r.Header.Set("Content-Type", contentTypeJson)
+	default:
+		r.Header.Set("Content-Type", contentTypeProto)
+	}
 
 	req := request{Request: r}
 	switch Compression(d.cfg.Compression) {
@@ -212,7 +226,7 @@ func bodyReader(buf []byte) func() io.ReadCloser {
 	}
 }
 
-func (d *client) getScheme() string {
+func (d *httpClient) getScheme() string {
 	if d.cfg.Insecure {
 		return "http"
 	}
@@ -249,14 +263,25 @@ func (e retryableError) Error() string {
 	return "retry-able request failure"
 }
 
-func (d *client) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLogs) error {
+func (d *httpClient) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLogs) error {
 
-	// Export the logs using the OTLP logs exporter client
+	// Export the logs using the OTLP logs exporter httpClient
 	exportLogs := &collogspb.ExportLogsServiceRequest{
 		ResourceLogs: protoLogs,
 	}
+
 	// Serialize the OTLP logs payload
-	rawRequest, _ := proto.Marshal(exportLogs)
+	var rawRequest []byte
+	switch d.cfg.Protocol {
+	case otlpconfig.ExporterProtocolHttpJson:
+		marshaller := jsonpb.Marshaler{
+			OrigName: true,
+		}
+		rawRequestString, _ := marshaller.MarshalToString(exportLogs)
+		rawRequest = []byte(rawRequestString)
+	default:
+		rawRequest, _ = proto.Marshal(exportLogs)
+	}
 
 	ctx, cancel := d.contextWithStop(ctx)
 	defer cancel()
@@ -298,8 +323,15 @@ func (d *client) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLog
 
 			if respData.Len() != 0 {
 				var respProto collogspb.ExportLogsServiceResponse
-				if err := proto.Unmarshal(respData.Bytes(), &respProto); err != nil {
-					return err
+				switch d.cfg.Protocol {
+				case otlpconfig.ExporterProtocolHttpJson:
+					if err := jsonpb.UnmarshalString(respData.String(), &respProto); err != nil {
+						return err
+					}
+				default:
+					if err := proto.Unmarshal(respData.Bytes(), &respProto); err != nil {
+						return err
+					}
 				}
 
 				// TODO: partialsuccess can't be handled properly by OTEL as current otlp.internal.PartialSuccess is custom
@@ -328,13 +360,13 @@ func (d *client) UploadLogs(ctx context.Context, protoLogs []*logspb.ResourceLog
 }
 
 // MarshalLog is the marshaling function used by the logging system to represent this Client.
-func (d *client) MarshalLog() interface{} {
+func (d *httpClient) MarshalLog() interface{} {
 	return struct {
 		Type     string
 		Endpoint string
 		Insecure bool
 	}{
-		Type:     "otlphttphttp",
+		Type:     string(d.cfg.Protocol),
 		Endpoint: d.cfg.Endpoint,
 		Insecure: d.cfg.Insecure,
 	}

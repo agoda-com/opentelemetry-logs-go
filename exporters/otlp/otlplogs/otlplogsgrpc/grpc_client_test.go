@@ -49,26 +49,26 @@ func contextWithTimeout(parent context.Context, t *testing.T, timeout time.Durat
 func TestNewEndToEnd(t *testing.T) {
 	tests := []struct {
 		name           string
-		additionalOpts []otlplogsgrpc.Option
+		additionalOpts []otlplogsgrpc.GrpcOption
 	}{
 		{
 			name: "StandardExporter",
 		},
 		{
 			name: "WithCompressor",
-			additionalOpts: []otlplogsgrpc.Option{
+			additionalOpts: []otlplogsgrpc.GrpcOption{
 				otlplogsgrpc.WithCompressor(gzip.Name),
 			},
 		},
 		{
 			name: "WithServiceConfig",
-			additionalOpts: []otlplogsgrpc.Option{
+			additionalOpts: []otlplogsgrpc.GrpcOption{
 				otlplogsgrpc.WithServiceConfig("{}"),
 			},
 		},
 		{
 			name: "WithDialOptions",
-			additionalOpts: []otlplogsgrpc.Option{
+			additionalOpts: []otlplogsgrpc.GrpcOption{
 				otlplogsgrpc.WithDialOption(grpc.WithBlock()),
 			},
 		},
@@ -81,8 +81,8 @@ func TestNewEndToEnd(t *testing.T) {
 	}
 }
 
-func newGRPCExporter(t *testing.T, ctx context.Context, endpoint string, additionalOpts ...otlplogsgrpc.Option) *otlplogs.Exporter {
-	opts := []otlplogsgrpc.Option{
+func newGRPCExporter(t *testing.T, ctx context.Context, endpoint string, additionalOpts ...otlplogsgrpc.GrpcOption) *otlplogs.Exporter {
+	opts := []otlplogsgrpc.GrpcOption{
 		otlplogsgrpc.WithInsecure(),
 		otlplogsgrpc.WithEndpoint(endpoint),
 		otlplogsgrpc.WithReconnectionPeriod(50 * time.Millisecond),
@@ -97,7 +97,7 @@ func newGRPCExporter(t *testing.T, ctx context.Context, endpoint string, additio
 	return exp
 }
 
-func newExporterEndToEndTest(t *testing.T, additionalOpts []otlplogsgrpc.Option) {
+func newExporterEndToEndTest(t *testing.T, additionalOpts []otlplogsgrpc.GrpcOption) {
 	mc := runMockCollector(t)
 
 	ctx := context.Background()
