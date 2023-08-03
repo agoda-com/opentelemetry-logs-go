@@ -22,9 +22,9 @@ import (
 	"context"
 	"fmt"
 	internal "github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal"
+	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
 	"github.com/golang/protobuf/jsonpb"
 	"go.opentelemetry.io/otel"
 	collogspb "go.opentelemetry.io/proto/otlp/collector/logs/v1"
@@ -340,8 +340,4 @@ func (d *client) MarshalLog() interface{} {
 		Endpoint: d.cfg.Endpoint,
 		Insecure: d.cfg.Insecure,
 	}
-}
-
-func init() {
-	otlplogs.Clients[otlpconfig.ExporterProtocolHttpJson] = NewClient()
 }

@@ -14,4 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package stdoutlogs // Package stdoutlogs import github.com/agoda-com/opentelemetry-logs-go/exporters/stdout/stdoutlogs
+package otlplogs
+
+// Version is the current release version of the OpenTelemetry OTLP logs exporter in use.
+func Version() string {
+	return "0.0.1"
+}
