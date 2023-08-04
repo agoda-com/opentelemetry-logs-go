@@ -76,8 +76,8 @@ type httpClient struct {
 	marshaller  jsonpb.Marshaler
 }
 
-// NewHttpClient creates a new HTTP logs httpClient.
-func NewHttpClient(opts ...HttpOption) *httpClient {
+// NewClient creates a new HTTP logs httpClient.
+func NewClient(opts ...Option) *httpClient {
 
 	cfg := otlpconfig.NewHTTPConfig(asHTTPOptions(opts)...)
 

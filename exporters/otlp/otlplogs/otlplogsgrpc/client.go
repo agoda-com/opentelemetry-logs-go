@@ -60,7 +60,7 @@ type grpcClient struct {
 	tsc     collogspb.LogsServiceClient
 }
 
-func NewGrpcClient(opts ...GrpcOption) *grpcClient {
+func NewClient(opts ...Option) *grpcClient {
 	cfg := otlpconfig.NewGRPCConfig(asGRPCOptions(opts)...)
 
 	ctx, cancel := context.WithCancel(context.Background())

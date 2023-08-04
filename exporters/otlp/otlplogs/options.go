@@ -50,9 +50,9 @@ func NewExporterConfig(options ...ExporterOption) ExporterConfig {
 		protocol := otlpconfig.ApplyEnvProtocol(otlpconfig.ExporterProtocolHttpProtobuf)
 
 		if protocol == otlpconfig.ExporterProtocolGrpc {
-			config.client = otlplogsgrpc.NewGrpcClient()
+			config.client = otlplogsgrpc.NewClient()
 		} else {
-			config.client = otlplogshttp.NewHttpClient()
+			config.client = otlplogshttp.NewClient()
 		}
 	}
 

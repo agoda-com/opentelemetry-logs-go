@@ -49,26 +49,26 @@ func contextWithTimeout(parent context.Context, t *testing.T, timeout time.Durat
 func TestNewEndToEnd(t *testing.T) {
 	tests := []struct {
 		name           string
-		additionalOpts []otlplogsgrpc.GrpcOption
+		additionalOpts []otlplogsgrpc.Option
 	}{
 		{
 			name: "StandardExporter",
 		},
 		{
 			name: "WithCompressor",
-			additionalOpts: []otlplogsgrpc.GrpcOption{
+			additionalOpts: []otlplogsgrpc.Option{
 				otlplogsgrpc.WithCompressor(gzip.Name),
 			},
 		},
 		{
 			name: "WithServiceConfig",
-			additionalOpts: []otlplogsgrpc.GrpcOption{
+			additionalOpts: []otlplogsgrpc.Option{
 				otlplogsgrpc.WithServiceConfig("{}"),
 			},
 		},
 		{
 			name: "WithDialOptions",
-			additionalOpts: []otlplogsgrpc.GrpcOption{
+			additionalOpts: []otlplogsgrpc.Option{
 				otlplogsgrpc.WithDialOption(grpc.WithBlock()),
 			},
 		},
@@ -81,15 +81,15 @@ func TestNewEndToEnd(t *testing.T) {
 	}
 }
 
-func newGRPCExporter(t *testing.T, ctx context.Context, endpoint string, additionalOpts ...otlplogsgrpc.GrpcOption) *otlplogs.Exporter {
-	opts := []otlplogsgrpc.GrpcOption{
+func newGRPCExporter(t *testing.T, ctx context.Context, endpoint string, additionalOpts ...otlplogsgrpc.Option) *otlplogs.Exporter {
+	opts := []otlplogsgrpc.Option{
 		otlplogsgrpc.WithInsecure(),
 		otlplogsgrpc.WithEndpoint(endpoint),
 		otlplogsgrpc.WithReconnectionPeriod(50 * time.Millisecond),
 	}
 
 	opts = append(opts, additionalOpts...)
-	client := otlplogsgrpc.NewGrpcClient(opts...)
+	client := otlplogsgrpc.NewClient(opts...)
 	exp, err := otlplogs.NewExporter(ctx, otlplogs.WithClient(client))
 	if err != nil {
 		t.Fatalf("failed to create a new collector exporter: %v", err)
@@ -97,7 +97,7 @@ func newGRPCExporter(t *testing.T, ctx context.Context, endpoint string, additio
 	return exp
 }
 
-func newExporterEndToEndTest(t *testing.T, additionalOpts []otlplogsgrpc.GrpcOption) {
+func newExporterEndToEndTest(t *testing.T, additionalOpts []otlplogsgrpc.Option) {
 	mc := runMockCollector(t)
 
 	ctx := context.Background()
@@ -118,7 +118,7 @@ func TestExporterShutdown(t *testing.T) {
 	t.Cleanup(func() { require.NoError(t, mc.stop()) })
 
 	factory := func() otlplogs.Client {
-		return otlplogsgrpc.NewGrpcClient(
+		return otlplogsgrpc.NewClient(
 			otlplogsgrpc.WithEndpoint(mc.endpoint),
 			otlplogsgrpc.WithInsecure(),
 			otlplogsgrpc.WithDialOption(grpc.WithBlock()),
@@ -349,7 +349,7 @@ func TestNewWithMultipleAttributeTypes(t *testing.T) {
 }
 
 func TestStartErrorInvalidAddress(t *testing.T) {
-	client := otlplogsgrpc.NewGrpcClient(
+	client := otlplogsgrpc.NewClient(
 		otlplogsgrpc.WithInsecure(),
 		// Validate the connection in Start (which should return the error).
 		otlplogsgrpc.WithDialOption(
