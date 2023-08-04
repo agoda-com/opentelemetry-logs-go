@@ -70,10 +70,12 @@ func WithEndpoint(endpoint string) Option {
 	return wrappedOption{otlpconfig.WithEndpoint(endpoint)}
 }
 
+// WithJsonProtocol will apply http/json protocol to Http client
 func WithJsonProtocol() Option {
 	return wrappedOption{otlpconfig.WithProtocol(otlpconfig.ExporterProtocolHttpJson)}
 }
 
+// WithProtobufProtocol will apply http/protobuf protocol to Http client
 func WithProtobufProtocol() Option {
 	return wrappedOption{otlpconfig.WithProtocol(otlpconfig.ExporterProtocolHttpProtobuf)}
 }
