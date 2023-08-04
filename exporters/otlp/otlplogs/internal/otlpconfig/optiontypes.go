@@ -26,6 +26,14 @@ const (
 	DefaultCollectorHost string = "localhost"
 )
 
+type Protocol string
+
+const (
+	ExporterProtocolGrpc         Protocol = "grpc"
+	ExporterProtocolHttpProtobuf Protocol = "http/protobuf"
+	ExporterProtocolHttpJson     Protocol = "http/json"
+)
+
 // Compression describes the compression used for payloads sent to the
 // collector.
 type Compression int

@@ -14,14 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package otlplogshttp
+package otlplogs
 
-import (
-	"context"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
-)
-
-// New constructs a new Exporter and starts it.
-func New(ctx context.Context) (*otlplogs.Exporter, error) {
-	return otlplogs.New(ctx, NewClient())
+// Version is the current release version of the OpenTelemetry OTLP logs exporter in use.
+func Version() string {
+	return "0.0.1"
 }

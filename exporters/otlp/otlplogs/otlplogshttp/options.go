@@ -18,8 +18,8 @@ package otlplogshttp
 
 import (
 	"crypto/tls"
+	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
 	"time"
 )
 
@@ -36,7 +36,7 @@ const (
 	GzipCompression = Compression(otlpconfig.GzipCompression)
 )
 
-// Option applies an option to the HTTP client.
+// Option applies an option to the HTTP httpClient.
 type Option interface {
 	applyHTTPOption(otlpconfig.Config) otlpconfig.Config
 }
@@ -70,6 +70,16 @@ func WithEndpoint(endpoint string) Option {
 	return wrappedOption{otlpconfig.WithEndpoint(endpoint)}
 }
 
+// WithJsonProtocol will apply http/json protocol to Http client
+func WithJsonProtocol() Option {
+	return wrappedOption{otlpconfig.WithProtocol(otlpconfig.ExporterProtocolHttpJson)}
+}
+
+// WithProtobufProtocol will apply http/protobuf protocol to Http client
+func WithProtobufProtocol() Option {
+	return wrappedOption{otlpconfig.WithProtocol(otlpconfig.ExporterProtocolHttpProtobuf)}
+}
+
 // WithCompression tells the driver to compress the sent data.
 func WithCompression(compression Compression) Option {
 	return wrappedOption{otlpconfig.WithCompression(otlpconfig.Compression(compression))}
@@ -82,7 +92,7 @@ func WithURLPath(urlPath string) Option {
 }
 
 // WithTLSClientConfig can be used to set up a custom TLS
-// configuration for the client used to send payloads to the
+// configuration for the httpClient used to send payloads to the
 // collector. Use it if you want to use a custom certificate.
 func WithTLSClientConfig(tlsCfg *tls.Config) Option {
 	return wrappedOption{otlpconfig.WithTLSClientConfig(tlsCfg)}

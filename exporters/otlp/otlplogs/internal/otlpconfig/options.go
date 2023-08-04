@@ -19,7 +19,7 @@ package otlpconfig
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
+	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
@@ -43,6 +43,7 @@ const (
 type (
 	SignalConfig struct {
 		Endpoint    string
+		Protocol    Protocol
 		Insecure    bool
 		TLSCfg      *tls.Config
 		Headers     map[string]string
@@ -321,6 +322,13 @@ func WithHeaders(headers map[string]string) GenericOption {
 func WithTimeout(duration time.Duration) GenericOption {
 	return newGenericOption(func(cfg Config) Config {
 		cfg.Logs.Timeout = duration
+		return cfg
+	})
+}
+
+func WithProtocol(protocol Protocol) GenericOption {
+	return newGenericOption(func(cfg Config) Config {
+		cfg.Logs.Protocol = protocol
 		return cfg
 	})
 }

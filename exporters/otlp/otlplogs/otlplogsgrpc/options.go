@@ -23,8 +23,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
+	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
 	"go.opentelemetry.io/otel"
 )
 
@@ -56,10 +56,10 @@ func (w wrappedOption) applyGRPCOption(cfg otlpconfig.Config) otlpconfig.Config 
 	return w.ApplyGRPCOption(cfg)
 }
 
-// WithInsecure disables client transport security for the exporter's gRPC
+// WithInsecure disables grpcClient transport security for the exporter's gRPC
 // connection just like grpc.WithInsecure()
 // (https://pkg.go.dev/google.golang.org/grpc#WithInsecure) does. Note, by
-// default, client security is required unless WithInsecure is used.
+// default, grpcClient security is required unless WithInsecure is used.
 //
 // This option has no effect if WithGRPCConn is used.
 func WithInsecure() Option {
@@ -94,7 +94,7 @@ func compressorToCompression(compressor string) otlpconfig.Compression {
 	return otlpconfig.NoCompression
 }
 
-// WithCompressor sets the compressor for the gRPC client to use when sending
+// WithCompressor sets the compressor for the gRPC grpcClient to use when sending
 // requests. It is the responsibility of the caller to ensure that the
 // compressor set has been registered with google.golang.org/grpc/encoding.
 // This can be done by encoding.RegisterCompressor. Some compressors
@@ -154,7 +154,7 @@ func WithDialOption(opts ...grpc.DialOption) Option {
 // establishing or persisting a gRPC connection to a target endpoint. Any
 // other option of those types passed will be ignored.
 //
-// It is the callers responsibility to close the passed conn. The client
+// It is the callers responsibility to close the passed conn. The grpcClient
 // Shutdown method will not close this connection.
 func WithGRPCConn(conn *grpc.ClientConn) Option {
 	return wrappedOption{otlpconfig.NewGRPCOption(func(cfg otlpconfig.Config) otlpconfig.Config {
@@ -163,7 +163,7 @@ func WithGRPCConn(conn *grpc.ClientConn) Option {
 	})}
 }
 
-// WithTimeout sets the max amount of time a client will attempt to export a
+// WithTimeout sets the max amount of time a grpcClient will attempt to export a
 // batch of logs. This takes precedence over any retry settings defined with
 // WithRetry, once this time limit has been reached the export is abandoned
 // and the batch of logs is dropped.

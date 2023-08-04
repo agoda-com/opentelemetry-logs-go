@@ -90,7 +90,7 @@ func newGRPCExporter(t *testing.T, ctx context.Context, endpoint string, additio
 
 	opts = append(opts, additionalOpts...)
 	client := otlplogsgrpc.NewClient(opts...)
-	exp, err := otlplogs.New(ctx, client)
+	exp, err := otlplogs.NewExporter(ctx, otlplogs.WithClient(client))
 	if err != nil {
 		t.Fatalf("failed to create a new collector exporter: %v", err)
 	}

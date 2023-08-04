@@ -14,4 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package stdoutlogs // Package stdoutlogs import github.com/agoda-com/opentelemetry-logs-go/exporters/stdout/stdoutlogs
+package sdk_test
+
+import (
+	"regexp"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk"
+)
+
+// regex taken from https://github.com/Masterminds/semver/tree/v3.1.1
+var versionRegex = regexp.MustCompile(`^v?([0-9]+)(\.[0-9]+)?(\.[0-9]+)?` +
+	`(-([0-9A-Za-z\-]+(\.[0-9A-Za-z\-]+)*))?` +
+	`(\+([0-9A-Za-z\-]+(\.[0-9A-Za-z\-]+)*))?$`)
+
+func TestVersionSemver(t *testing.T) {
+	v := sdk.Version()
+	assert.NotNil(t, versionRegex.FindStringSubmatch(v), "version is not semver: %s", v)
+}
