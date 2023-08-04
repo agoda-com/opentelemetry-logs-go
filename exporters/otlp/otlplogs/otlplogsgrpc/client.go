@@ -24,7 +24,6 @@ import (
 
 	internal "github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
 
 	"go.opentelemetry.io/otel"
@@ -61,15 +60,7 @@ type grpcClient struct {
 	tsc     collogspb.LogsServiceClient
 }
 
-// Compile time check *grpcClient implements otlplogs.Client.
-var _ otlplogs.Client = (*grpcClient)(nil)
-
-// NewClient creates a new gRPC logs grpcClient.
-func NewClient(opts ...GrpcOption) otlplogs.Client {
-	return newClient(opts...)
-}
-
-func newClient(opts ...GrpcOption) *grpcClient {
+func NewGrpcClient(opts ...GrpcOption) *grpcClient {
 	cfg := otlpconfig.NewGRPCConfig(asGRPCOptions(opts)...)
 
 	ctx, cancel := context.WithCancel(context.Background())

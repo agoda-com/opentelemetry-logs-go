@@ -89,7 +89,7 @@ func newGRPCExporter(t *testing.T, ctx context.Context, endpoint string, additio
 	}
 
 	opts = append(opts, additionalOpts...)
-	client := otlplogsgrpc.NewClient(opts...)
+	client := otlplogsgrpc.NewGrpcClient(opts...)
 	exp, err := otlplogs.NewExporter(ctx, otlplogs.WithClient(client))
 	if err != nil {
 		t.Fatalf("failed to create a new collector exporter: %v", err)
@@ -118,7 +118,7 @@ func TestExporterShutdown(t *testing.T) {
 	t.Cleanup(func() { require.NoError(t, mc.stop()) })
 
 	factory := func() otlplogs.Client {
-		return otlplogsgrpc.NewClient(
+		return otlplogsgrpc.NewGrpcClient(
 			otlplogsgrpc.WithEndpoint(mc.endpoint),
 			otlplogsgrpc.WithInsecure(),
 			otlplogsgrpc.WithDialOption(grpc.WithBlock()),
@@ -349,7 +349,7 @@ func TestNewWithMultipleAttributeTypes(t *testing.T) {
 }
 
 func TestStartErrorInvalidAddress(t *testing.T) {
-	client := otlplogsgrpc.NewClient(
+	client := otlplogsgrpc.NewGrpcClient(
 		otlplogsgrpc.WithInsecure(),
 		// Validate the connection in Start (which should return the error).
 		otlplogsgrpc.WithDialOption(

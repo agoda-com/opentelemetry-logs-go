@@ -14,12 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package otlplogshttp
+package otlplogs
 
 import (
 	"context"
 	"github.com/agoda-com/opentelemetry-logs-go"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
 	"github.com/agoda-com/opentelemetry-logs-go/logs"
 	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -64,8 +63,8 @@ func doSomething() {
 }
 
 func installExportPipeline(ctx context.Context) (func(context.Context) error, error) {
-	client := NewClient()
-	exporter, _ := otlplogs.NewExporter(ctx, otlplogs.WithClient(client))
+	// New autoconfigured OTLP exporter
+	exporter, _ := NewExporter(ctx)
 
 	loggerProvider := sdk.NewLoggerProvider(
 		sdk.WithBatcher(exporter),

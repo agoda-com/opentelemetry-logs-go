@@ -23,7 +23,6 @@ import (
 	"fmt"
 	internal "github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
@@ -77,10 +76,8 @@ type httpClient struct {
 	marshaller  jsonpb.Marshaler
 }
 
-var _ otlplogs.Client = (*httpClient)(nil)
-
-// NewClient creates a new HTTP logs httpClient.
-func NewClient(opts ...HttpOption) otlplogs.Client {
+// NewHttpClient creates a new HTTP logs httpClient.
+func NewHttpClient(opts ...HttpOption) *httpClient {
 
 	cfg := otlpconfig.NewHTTPConfig(asHTTPOptions(opts)...)
 
