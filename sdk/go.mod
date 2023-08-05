@@ -3,8 +3,8 @@ module github.com/agoda-com/opentelemetry-logs-go/sdk
 go 1.19
 
 require (
-	github.com/agoda-com/opentelemetry-logs-go v0.1.0
-	github.com/agoda-com/opentelemetry-logs-go/logs v0.1.0
+	github.com/agoda-com/opentelemetry-logs-go v0.1.1
+	github.com/agoda-com/opentelemetry-logs-go/logs v0.1.1
 	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/otel/sdk v1.16.0
