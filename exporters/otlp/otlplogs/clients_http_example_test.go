@@ -24,7 +24,6 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	"log"
-	"testing"
 	"time"
 )
 
@@ -65,10 +64,10 @@ func doSomething() {
 
 func installExportPipeline(ctx context.Context) (func(context.Context) error, error) {
 	// New autoconfigured OTLP exporter
-	//	exporter, _ := NewExporter(ctx)
+	exporter, _ := NewExporter(ctx)
 
 	loggerProvider := sdk.NewLoggerProvider(
-		//	sdk.WithBatcher(exporter),
+		sdk.WithBatcher(exporter),
 		sdk.WithResource(newResource()),
 	)
 	otel.SetLoggerProvider(loggerProvider)
@@ -76,7 +75,7 @@ func installExportPipeline(ctx context.Context) (func(context.Context) error, er
 	return loggerProvider.Shutdown, nil
 }
 
-func TestExample(t *testing.T) {
+func Example() {
 	{
 		ctx := context.Background()
 		// Registers a logger Provider globally.
