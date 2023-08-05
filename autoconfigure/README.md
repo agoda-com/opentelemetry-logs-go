@@ -32,9 +32,9 @@ func main() {
 	)
 
 	ctx := context.Background()
-	provider := autosdk.NewLoggerProvider(ctx, autosdk.WithResource(attrs))
+	loggerProvider := autosdk.NewLoggerProvider(ctx, autosdk.WithResource(attrs))
 	defer func() {
-		defer provider.Shutdown(ctx)
+		loggerProvider.Shutdown(ctx)
 	}()
 }
 
