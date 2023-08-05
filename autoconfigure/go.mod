@@ -3,18 +3,18 @@ module github.com/agoda-com/opentelemetry-logs-go/autoconfigure
 go 1.19
 
 require (
-	github.com/agoda-com/opentelemetry-logs-go v0.1.0
-	github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs v0.1.0
-	github.com/agoda-com/opentelemetry-logs-go/exporters/stdout/stdoutlogs v0.1.0
-	github.com/agoda-com/opentelemetry-logs-go/logs v0.1.0
-	github.com/agoda-com/opentelemetry-logs-go/sdk v0.1.0
+	github.com/agoda-com/opentelemetry-logs-go v0.1.1
+	github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs v0.1.1
+	github.com/agoda-com/opentelemetry-logs-go/exporters/stdout/stdoutlogs v0.1.1
+	github.com/agoda-com/opentelemetry-logs-go/logs v0.1.1
+	github.com/agoda-com/opentelemetry-logs-go/sdk v0.1.1
 	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/otel/sdk v1.16.0
 )
 
 require (
-	github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry v0.1.0 // indirect
+	github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry v0.1.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect

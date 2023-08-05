@@ -3,10 +3,10 @@ module github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs
 go 1.19
 
 require (
-	github.com/agoda-com/opentelemetry-logs-go v0.1.0
-	github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry v0.1.0
-	github.com/agoda-com/opentelemetry-logs-go/logs v0.1.0
-	github.com/agoda-com/opentelemetry-logs-go/sdk v0.1.0
+	github.com/agoda-com/opentelemetry-logs-go v0.1.1
+	github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry v0.1.1
+	github.com/agoda-com/opentelemetry-logs-go/logs v0.1.1
+	github.com/agoda-com/opentelemetry-logs-go/sdk v0.1.1
 	github.com/golang/protobuf v1.5.3
 	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/otel v1.16.0
