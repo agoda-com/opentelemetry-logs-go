@@ -17,6 +17,15 @@ No Logs Pull Requests are currently being accepted.
 This project will be deprecated once official [opentelemetry-go](https://github.com/open-telemetry/opentelemetry-go)
 repository Logs module will have status "Stable".
 
+## Project packages
+
+| Packages                         | Description                                                                |
+|----------------------------------|----------------------------------------------------------------------------|
+| [autoconfigure](./autoconfigure) | Autoconfiguration SDK. Allow to configure log exporters with env variables |
+| [sdk](./sdk)                     | Opentelemetry Logs SDK                                                     |
+| [exporters/otlp](./exporters)    | OTLP format exporter                                                       |
+| [exporters/stdout](./exporters)  | Console exporter                                                           |                                                            
+
 ## Quick start
 
 This is an implementation of [Logs Bridge API](https://opentelemetry.io/docs/specs/otel/logs/bridge-api/) and not
@@ -35,26 +44,26 @@ import (
 )
 
 const (
-  instrumentationName = "otel/zap"
-  instrumentationVersion = "0.0.1"
+	instrumentationName    = "otel/zap"
+	instrumentationVersion = "0.0.1"
 )
 
 var (
-  logger = otel.GetLoggerProvider().Logger(
-      instrumentationName,
-      logs.WithInstrumentationVersion(instrumentationVersion),
-      logs.WithSchemaURL(semconv.SchemaURL),
-  )
+	logger = otel.GetLoggerProvider().Logger(
+		instrumentationName,
+		logs.WithInstrumentationVersion(instrumentationVersion),
+		logs.WithSchemaURL(semconv.SchemaURL),
+	)
 )
 
 func (c otlpCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
-	
-  lrc := logs.LogRecordConfig{
-    Body: &ent.Message,
-	...
-  }
-  logRecord := logs.NewLogRecord(lrc)
-  logger.Emit(logRecord)
+
+	lrc := logs.LogRecordConfig{
+		Body: &ent.Message,
+		...
+	}
+	logRecord := logs.NewLogRecord(lrc)
+	logger.Emit(logRecord)
 }
 ```
 
@@ -64,6 +73,7 @@ and application initialization code:
 package main
 
 import (
+	"os"
 	"context"
 	"github.com/agoda-com/opentelemetry-logs-go"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
@@ -74,10 +84,12 @@ import (
 )
 
 func newResource() *resource.Resource {
+	host, _ := os.Hostname()
 	return resource.NewWithAttributes(
 		semconv.SchemaURL,
 		semconv.ServiceName("otlplogs-example"),
 		semconv.ServiceVersion("0.0.1"),
+		semconv.HostName(host),
 	)
 }
 
@@ -90,7 +102,7 @@ func main() {
 		sdk.WithResource(newResource()),
 	)
 	otel.SetLoggerProvider(loggerProvider)
-	
+
 	myInstrumentedLogger.Info("Hello OpenTelemetry")
 }
 ```

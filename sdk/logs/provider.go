@@ -32,7 +32,7 @@ const (
 	defaultLoggerName = "gitlab.agodadev.io/devenv/devstack/pkg/otel/sdk/logger"
 )
 
-// loggerProviderConfig Configuration for OTEL extension for zap logger
+// loggerProviderConfig Configuration for Logger Provider
 type loggerProviderConfig struct {
 	processors []LogRecordProcessor
 	// resource contains attributes representing an entity that produces telemetry.
@@ -269,5 +269,6 @@ func ensureValidLoggerProviderConfig(cfg loggerProviderConfig) loggerProviderCon
 	if cfg.resource == nil {
 		cfg.resource = resource.Default()
 	}
+
 	return cfg
 }

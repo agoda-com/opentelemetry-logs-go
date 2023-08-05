@@ -29,8 +29,8 @@ import (
 
 var _ sdk.LogRecordExporter = &Exporter{}
 
-// New creates an Exporter with the passed options.
-func New(options ...Option) (*Exporter, error) {
+// NewExporter creates an Exporter with the passed options.
+func NewExporter(options ...Option) (*Exporter, error) {
 	cfg, err := newConfig(options...)
 	if err != nil {
 		return nil, err

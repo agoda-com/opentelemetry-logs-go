@@ -62,7 +62,7 @@ func doSomething() {
 }
 
 func installExportPipeline(ctx context.Context) (func(context.Context) error, error) {
-	exporter, _ := New()
+	exporter, _ := NewExporter()
 
 	loggerProvider := sdk.NewLoggerProvider(
 		sdk.WithSyncer(exporter),
