@@ -32,7 +32,7 @@ const (
 	defaultLoggerName = "gitlab.agodadev.io/devenv/devstack/pkg/otel/sdk/logger"
 )
 
-// loggerProviderConfig Configuration for OTEL extension for zap logger
+// loggerProviderConfig Configuration for Logger Provider
 type loggerProviderConfig struct {
 	processors []LogRecordProcessor
 	// resource contains attributes representing an entity that produces telemetry.
@@ -260,9 +260,6 @@ func applyLoggerProviderEnvConfigs(cfg loggerProviderConfig) loggerProviderConfi
 func loggerProviderOptionsFromEnv() []LoggerProviderOption {
 	var opts []LoggerProviderOption
 
-	// TODO: Apply only if not defined, if env configured with empty value - create empty array - i.e. disable exporters
-	_, _ = exportersFromEnv()
-
 	return opts
 }
 
@@ -272,11 +269,6 @@ func ensureValidLoggerProviderConfig(cfg loggerProviderConfig) loggerProviderCon
 	if cfg.resource == nil {
 		cfg.resource = resource.Default()
 	}
-
-	// TODO: Default to Batcher OTLP? Should it be backward compatible?
-	//if cfg.processors == nil {
-	//	cfg.processors =
-	//}
 
 	return cfg
 }

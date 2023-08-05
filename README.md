@@ -64,6 +64,7 @@ and application initialization code:
 package main
 
 import (
+	"os"
 	"context"
 	"github.com/agoda-com/opentelemetry-logs-go"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs"
@@ -74,10 +75,12 @@ import (
 )
 
 func newResource() *resource.Resource {
+	host, _ := os.Hostname()
 	return resource.NewWithAttributes(
 		semconv.SchemaURL,
 		semconv.ServiceName("otlplogs-example"),
 		semconv.ServiceVersion("0.0.1"),
+		semconv.HostName(host),
 	)
 }
 

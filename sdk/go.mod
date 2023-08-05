@@ -2,8 +2,6 @@ module github.com/agoda-com/opentelemetry-logs-go/sdk
 
 go 1.19
 
-replace github.com/agoda-com/opentelemetry-logs-go => ../
-
 require (
 	github.com/agoda-com/opentelemetry-logs-go v0.0.1
 	github.com/agoda-com/opentelemetry-logs-go/logs v0.0.1
@@ -24,4 +22,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/agoda-com/opentelemetry-logs-go/logs => ../logs
+replace (
+    github.com/agoda-com/opentelemetry-logs-go => ../
+    github.com/agoda-com/opentelemetry-logs-go/logs => ../logs
+)
