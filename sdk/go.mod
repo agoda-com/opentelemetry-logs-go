@@ -3,8 +3,8 @@ module github.com/agoda-com/opentelemetry-logs-go/sdk
 go 1.19
 
 require (
-	github.com/agoda-com/opentelemetry-logs-go v0.0.1
-	github.com/agoda-com/opentelemetry-logs-go/logs v0.0.1
+	github.com/agoda-com/opentelemetry-logs-go v0.1.0
+	github.com/agoda-com/opentelemetry-logs-go/logs v0.1.0
 	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/otel/sdk v1.16.0
@@ -23,6 +23,6 @@ require (
 )
 
 replace (
-    github.com/agoda-com/opentelemetry-logs-go => ../
-    github.com/agoda-com/opentelemetry-logs-go/logs => ../logs
+	github.com/agoda-com/opentelemetry-logs-go => ../
+	github.com/agoda-com/opentelemetry-logs-go/logs => ../logs
 )

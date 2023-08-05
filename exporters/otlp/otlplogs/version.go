@@ -18,5 +18,5 @@ package otlplogs
 
 // Version is the current release version of the OpenTelemetry OTLP logs exporter in use.
 func Version() string {
-	return "0.0.1"
+	return "0.1.0"
 }
