@@ -8,10 +8,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-## [v0.1.1] 2023-08-05
+## [v0.1.2] 2023-08-05
 
 ### Fixed
 
+- reverted to all-in-one package
 - inconsistent v0.1.0 go package
 
 ## [v0.1.0] 2023-08-05
