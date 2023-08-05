@@ -38,7 +38,7 @@ func doSomething() {
 }
 func TestProvider(t *testing.T) {
 	ctx := context.Background()
-	provider, _ := autosdk.NewLoggerProvider(ctx)
+	provider := autosdk.NewLoggerProvider(ctx)
 	defer func(provider *sdk.LoggerProvider, ctx context.Context) {
 		err := provider.Shutdown(ctx)
 		if err != nil {
