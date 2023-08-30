@@ -1,6 +1,7 @@
 # OpenTelemetry-Logs-Go
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/agoda-com/opentelemetry-logs-go.svg)](https://pkg.go.dev/github.com/agoda-com/opentelemetry-logs-go)
+[![codecov](https://codecov.io/github/agoda-com/opentelemetry-logs-go/graph/badge.svg?token=F1NW0R0W75)](https://codecov.io/github/agoda-com/opentelemetry-logs-go)
 
 OpenTelemetry-Logs-Go is the [Go](https://golang.org) implementation of [OpenTelemetry](https://opentelemetry.io/) Logs.
 It provides API to directly send logging data to observability platforms. It is an extension of official
