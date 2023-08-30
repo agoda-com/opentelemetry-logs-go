@@ -24,11 +24,11 @@ import (
 	internal "github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
 	"go.opentelemetry.io/otel"
 	collogspb "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 	logspb "go.opentelemetry.io/proto/otlp/logs/v1"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"io"
 	"net"
 	"net/http"
@@ -73,7 +73,6 @@ type httpClient struct {
 	client      *http.Client
 	stopCh      chan struct{}
 	stopOnce    sync.Once
-	marshaller  jsonpb.Marshaler
 }
 
 // NewClient creates a new HTTP logs httpClient.
@@ -271,11 +270,9 @@ func (d *httpClient) UploadLogs(ctx context.Context, protoLogs []*logspb.Resourc
 	var rawRequest []byte
 	switch d.cfg.Protocol {
 	case otlpconfig.ExporterProtocolHttpJson:
-		marshaller := jsonpb.Marshaler{
-			OrigName: true,
-		}
-		rawRequestString, _ := marshaller.MarshalToString(exportLogs)
-		rawRequest = []byte(rawRequestString)
+		rawRequest, _ = protojson.MarshalOptions{
+			UseProtoNames: false,
+		}.Marshal(exportLogs)
 	default:
 		rawRequest, _ = proto.Marshal(exportLogs)
 	}
@@ -322,7 +319,7 @@ func (d *httpClient) UploadLogs(ctx context.Context, protoLogs []*logspb.Resourc
 				var respProto collogspb.ExportLogsServiceResponse
 				switch d.cfg.Protocol {
 				case otlpconfig.ExporterProtocolHttpJson:
-					if err := jsonpb.UnmarshalString(respData.String(), &respProto); err != nil {
+					if err := protojson.Unmarshal(respData.Bytes(), &respProto); err != nil {
 						return err
 					}
 				default:
