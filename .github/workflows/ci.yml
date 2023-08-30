@@ -34,4 +34,7 @@ jobs:
       - name: Run coverage tests
         run: |
           make test-coverage
-          curl -s https://codecov.io/bash | bash -s -- -Z -f coverage.out
+      - name: Upload coverage reports to codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
