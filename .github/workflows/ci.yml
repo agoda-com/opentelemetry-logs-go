@@ -34,3 +34,4 @@ jobs:
       - name: Run coverage tests
         run: |
           make test-coverage
+          curl -s https://codecov.io/bash | bash -s -- -Z -f coverage.out
