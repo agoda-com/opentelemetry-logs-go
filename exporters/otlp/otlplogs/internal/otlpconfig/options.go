@@ -20,6 +20,8 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
+
+	//"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
