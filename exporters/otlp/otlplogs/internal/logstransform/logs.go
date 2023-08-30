@@ -31,63 +31,7 @@ func Logs(sdl []sdk.ReadableLogRecord) []*logspb.ResourceLogs {
 
 	for _, sd := range sdl {
 
-		var body *commonpb.AnyValue = nil
-		if sd.Body() != nil {
-			body = &commonpb.AnyValue{
-				Value: &commonpb.AnyValue_StringValue{
-					StringValue: *sd.Body(),
-				},
-			}
-		}
-
-		var traceIDBytes []byte
-		if sd.TraceId() != nil {
-			tid := *sd.TraceId()
-			traceIDBytes = tid[:]
-		}
-		var spanIDBytes []byte
-		if sd.SpanId() != nil {
-			sid := *sd.SpanId()
-			spanIDBytes = sid[:]
-		}
-		var traceFlags byte = 0
-		if sd.TraceFlags() != nil {
-			tf := *sd.TraceFlags()
-			traceFlags = byte(tf)
-		}
-		var ts time.Time
-		if sd.Timestamp() != nil {
-			ts = *sd.Timestamp()
-		} else {
-			ts = sd.ObservedTimestamp()
-		}
-
-		var kv []*commonpb.KeyValue
-		if sd.Attributes() != nil {
-			kv = KeyValues(*sd.Attributes())
-		}
-
-		var st = ""
-		if sd.SeverityText() != nil {
-			st = *sd.SeverityText()
-		}
-
-		var sn = logspb.SeverityNumber_SEVERITY_NUMBER_UNSPECIFIED
-		if sd.SeverityNumber() != nil {
-			sn = logspb.SeverityNumber(*sd.SeverityNumber())
-		}
-
-		logRecord := &logspb.LogRecord{
-			TimeUnixNano:         uint64(ts.UnixNano()),
-			ObservedTimeUnixNano: uint64(sd.ObservedTimestamp().UnixNano()),
-			TraceId:              traceIDBytes,       // provide the associated trace ID if available
-			SpanId:               spanIDBytes,        // provide the associated span ID if available
-			Flags:                uint32(traceFlags), // provide the associated trace flags
-			Body:                 body,               // provide the associated log body if available
-			Attributes:           kv,                 // provide additional log attributes if available
-			SeverityText:         st,
-			SeverityNumber:       sn,
-		}
+		lr := logRecord(sd)
 
 		var is *commonpb.InstrumentationScope
 		var schemaURL = ""
@@ -109,7 +53,7 @@ func Logs(sdl []sdk.ReadableLogRecord) []*logspb.ResourceLogs {
 				{
 					Scope:      is,
 					SchemaUrl:  schemaURL,
-					LogRecords: []*logspb.LogRecord{logRecord},
+					LogRecords: []*logspb.LogRecord{lr},
 				},
 			},
 		}
@@ -118,4 +62,65 @@ func Logs(sdl []sdk.ReadableLogRecord) []*logspb.ResourceLogs {
 	}
 
 	return resourceLogs
+}
+
+func logRecord(record sdk.ReadableLogRecord) *logspb.LogRecord {
+	var body *commonpb.AnyValue = nil
+	if record.Body() != nil {
+		body = &commonpb.AnyValue{
+			Value: &commonpb.AnyValue_StringValue{
+				StringValue: *record.Body(),
+			},
+		}
+	}
+
+	var traceIDBytes []byte
+	if record.TraceId() != nil {
+		tid := *record.TraceId()
+		traceIDBytes = tid[:]
+	}
+	var spanIDBytes []byte
+	if record.SpanId() != nil {
+		sid := *record.SpanId()
+		spanIDBytes = sid[:]
+	}
+	var traceFlags byte = 0
+	if record.TraceFlags() != nil {
+		tf := *record.TraceFlags()
+		traceFlags = byte(tf)
+	}
+	var ts time.Time
+	if record.Timestamp() != nil {
+		ts = *record.Timestamp()
+	} else {
+		ts = record.ObservedTimestamp()
+	}
+
+	var kv []*commonpb.KeyValue
+	if record.Attributes() != nil {
+		kv = KeyValues(*record.Attributes())
+	}
+
+	var st = ""
+	if record.SeverityText() != nil {
+		st = *record.SeverityText()
+	}
+
+	var sn = logspb.SeverityNumber_SEVERITY_NUMBER_UNSPECIFIED
+	if record.SeverityNumber() != nil {
+		sn = logspb.SeverityNumber(*record.SeverityNumber())
+	}
+
+	logRecord := &logspb.LogRecord{
+		TimeUnixNano:         uint64(ts.UnixNano()),
+		ObservedTimeUnixNano: uint64(record.ObservedTimestamp().UnixNano()),
+		TraceId:              traceIDBytes,       // provide the associated trace ID if available
+		SpanId:               spanIDBytes,        // provide the associated span ID if available
+		Flags:                uint32(traceFlags), // provide the associated trace flags
+		Body:                 body,               // provide the associated log body if available
+		Attributes:           kv,                 // provide additional log attributes if available
+		SeverityText:         st,
+		SeverityNumber:       sn,
+	}
+	return logRecord
 }

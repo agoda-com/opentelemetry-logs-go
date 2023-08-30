@@ -19,9 +19,7 @@ package otlpconfig
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
-
-	//"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/internal/retry"
+	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
@@ -105,6 +103,20 @@ func NewHTTPConfig(opts ...HTTPOption) Config {
 
 func GetUserAgentHeader() string {
 	return "OTel OTLP Exporter Go/" + otel.Version()
+}
+
+// cleanPath returns a path with all spaces trimmed and all redundancies
+// removed. If urlPath is empty or cleaning it results in an empty string,
+// defaultPath is returned instead.
+func cleanPath(urlPath string, defaultPath string) string {
+	tmp := path.Clean(strings.TrimSpace(urlPath))
+	if tmp == "." {
+		return defaultPath
+	}
+	if !path.IsAbs(tmp) {
+		tmp = fmt.Sprintf("/%s", tmp)
+	}
+	return tmp
 }
 
 // NewGRPCConfig returns a new Config with all settings applied from opts and
