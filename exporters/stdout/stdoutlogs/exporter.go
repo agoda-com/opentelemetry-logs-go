@@ -19,9 +19,7 @@ package stdoutlogs
 import (
 	"context"
 	"encoding/json"
-	"strings"
 	"sync"
-	"time"
 
 	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 )
@@ -72,69 +70,8 @@ func (e *Exporter) Export(ctx context.Context, logs []sdk.ReadableLogRecord) err
 	e.encoderMu.Lock()
 	defer e.encoderMu.Unlock()
 	for _, lr := range logRecords {
-
-		var logMessageBuilder strings.Builder
-
-		logMessageBuilder.WriteString(lr.ObservedTimestamp.Format(time.RFC3339))
-		logMessageBuilder.WriteString(" ")
-		logMessageBuilder.WriteString(lr.getSeverityText())
-		logMessageBuilder.WriteString(" ")
-		if lr.Body != nil {
-			logMessageBuilder.WriteString(*lr.Body)
-			logMessageBuilder.WriteString(" ")
-		}
-
-		if lr.TraceId != nil || lr.SpanId != nil {
-			logMessageBuilder.WriteString(": ")
-			if lr.TraceId != nil {
-				traceId := *lr.TraceId
-				logMessageBuilder.WriteString("traceId=")
-				logMessageBuilder.WriteString(traceId.String())
-				logMessageBuilder.WriteString(" ")
-			}
-			if lr.SpanId != nil {
-				spanId := *lr.SpanId
-				logMessageBuilder.WriteString("spanId=")
-				logMessageBuilder.WriteString(spanId.String())
-				logMessageBuilder.WriteString(" ")
-			}
-		}
-
-		if lr.InstrumentationScope != nil {
-			logMessageBuilder.WriteString("[scopeInfo: ")
-			scope := *lr.InstrumentationScope
-			logMessageBuilder.WriteString(scope.Name)
-			if scope.Version != "" {
-				logMessageBuilder.WriteString(":")
-				logMessageBuilder.WriteString(scope.Version)
-			}
-			logMessageBuilder.WriteString("] ")
-		}
-
-		attributes := lr.Resource.Attributes()
-		if lr.Attributes != nil {
-			attributes = append(attributes, *lr.Attributes...)
-		}
-
-		if len(attributes) > 0 {
-			logMessageBuilder.WriteString("{")
-			for i, a := range attributes {
-				logMessageBuilder.WriteString(string(a.Key))
-				logMessageBuilder.WriteString("=")
-				logMessageBuilder.WriteString(a.Value.AsString())
-				if i < len(attributes)-1 {
-					logMessageBuilder.WriteString(", ")
-				}
-			}
-			logMessageBuilder.WriteString("}")
-		}
-
-		// Write EOL
-		logMessageBuilder.Write([]byte("\n"))
-
-		// Print logRecords, one by one
-		_, err := e.writer.Write([]byte(logMessageBuilder.String()))
-		if err != nil {
+		// Encode span stubs, one by one
+		if err := e.encoder.Encode(lr); err != nil {
 			return err
 		}
 	}
