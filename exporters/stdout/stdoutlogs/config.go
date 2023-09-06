@@ -22,19 +22,25 @@ import (
 )
 
 var (
-	defaultWriter = os.Stdout
+	defaultWriter      = os.Stdout
+	defaultPrettyPrint = false
 )
 
 // config contains options for the STDOUT exporter.
 type config struct {
 	// Writer is the destination.  If not set, os.Stdout is used.
 	Writer io.Writer
+
+	// PrettyPrint will encode the output into readable JSON. Default is
+	// false.
+	PrettyPrint bool
 }
 
 // newConfig creates a validated Config configured with options.
 func newConfig(options ...Option) (config, error) {
 	cfg := config{
-		Writer: defaultWriter,
+		Writer:      defaultWriter,
+		PrettyPrint: defaultPrettyPrint,
 	}
 	for _, opt := range options {
 		cfg = opt.apply(cfg)
@@ -58,5 +64,17 @@ type writerOption struct {
 
 func (o writerOption) apply(cfg config) config {
 	cfg.Writer = o.W
+	return cfg
+}
+
+// WithPrettyPrint sets the export stream format to use JSON.
+func WithPrettyPrint() Option {
+	return prettyPrintOption(true)
+}
+
+type prettyPrintOption bool
+
+func (o prettyPrintOption) apply(cfg config) config {
+	cfg.PrettyPrint = bool(o)
 	return cfg
 }
