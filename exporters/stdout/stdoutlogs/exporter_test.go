@@ -1,29 +1,17 @@
-/*
-Copyright Agoda Services Co.,Ltd.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package stdoutlogs
 
 import (
+	"bytes"
 	"context"
-	"github.com/agoda-com/opentelemetry-logs-go"
+	otel "github.com/agoda-com/opentelemetry-logs-go"
 	"github.com/agoda-com/opentelemetry-logs-go/logs"
 	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
+	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
+	"io"
 	"log"
+	"testing"
 	"time"
 )
 
@@ -61,8 +49,8 @@ func doSomething() {
 	logger.Emit(logRecord)
 }
 
-func installExportPipeline(ctx context.Context) (func(context.Context) error, error) {
-	exporter, _ := NewExporter()
+func installExportPipeline(writer io.Writer) (func(context.Context) error, error) {
+	exporter, _ := NewExporter(WithWriter(writer))
 
 	loggerProvider := sdk.NewLoggerProvider(
 		sdk.WithSyncer(exporter),
@@ -73,11 +61,13 @@ func installExportPipeline(ctx context.Context) (func(context.Context) error, er
 	return loggerProvider.Shutdown, nil
 }
 
-func Example() {
+func TestStdoutExporter(t *testing.T) {
 	{
 		ctx := context.Background()
+
+		var writer bytes.Buffer
 		// Registers a logger Provider globally.
-		shutdown, err := installExportPipeline(ctx)
+		shutdown, err := installExportPipeline(&writer)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -88,5 +78,9 @@ func Example() {
 				log.Fatal(err)
 			}
 		}()
+
+		actual := writer.String()
+
+		assert.Contains(t, actual, "INFO My message {service.name=otlplogs-example, service.version=0.0.1}")
 	}
 }

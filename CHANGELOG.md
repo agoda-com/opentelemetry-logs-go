@@ -8,6 +8,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Changed
+
+- opentelemetry update to 1.18.0
+
+### Fixed
+- stdoutlogs writer parameter was ignored
+
 ## [v0.2.0] 2023-08-30
 
 ### Changed

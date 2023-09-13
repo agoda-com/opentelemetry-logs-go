@@ -18,10 +18,8 @@ package stdoutlogs
 
 import (
 	"context"
-	"fmt"
 	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 	"io"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -62,8 +60,6 @@ func (e *Exporter) Export(ctx context.Context, logs []sdk.ReadableLogRecord) err
 	if len(logs) == 0 {
 		return nil
 	}
-
-	wr := os.Stdout
 
 	logRecords := logRecordsFromReadableLogRecords(logs)
 
@@ -127,8 +123,11 @@ func (e *Exporter) Export(ctx context.Context, logs []sdk.ReadableLogRecord) err
 			logMessageBuilder.WriteString("}")
 		}
 
+		// Write EOL
+		logMessageBuilder.Write([]byte("\n"))
+
 		// Print logRecords, one by one
-		_, err := fmt.Fprintf(wr, "%s\n", logMessageBuilder.String())
+		_, err := e.writer.Write([]byte(logMessageBuilder.String()))
 		if err != nil {
 			return err
 		}
