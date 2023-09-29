@@ -8,11 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Changed
+
+- opentelemetry updated to 1.19.0
+
 ## [v0.3.0] 2023-09-13
 
 ### Changed
 
-- opentelemetry update to 1.18.0
+- opentelemetry updated to 1.18.0
 
 ### Fixed
 
@@ -22,7 +26,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 
-- opentelemetry update to 1.17.0
+- opentelemetry updated to 1.17.0
 - `github.com/golang/protobuf/proto` replaced with `google.golang.org/protobuf`
 - `otlp/internal` package moved to `otlp/otlplogs/internal`
 - more unit tests added
