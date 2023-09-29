@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 
 - opentelemetry updated to 1.19.0
+- drop compatibility guarantee of Go [1.19](https://go.dev/doc/go1.19)
 
 ## [v0.3.0] 2023-09-13
 
