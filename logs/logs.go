@@ -126,7 +126,7 @@ type Logger interface {
 	Emit(logRecord LogRecord)
 }
 
-// LoggerProvider provides Tracers that are used by instrumentation code to
+// LoggerProvider provides Loggers that are used by instrumentation code to
 // log computational workflows.
 //
 // A LoggerProvider is the collection destination of logs
@@ -157,7 +157,7 @@ type LoggerProvider interface {
 	// same underlying instance of that Logger or not). It is not necessary to
 	// call this multiple times with the same name and options to get an
 	// up-to-date Logger. All implementations will ensure any LoggerProvider
-	// configuration changes are propagated to all provided Tracers.
+	// configuration changes are propagated to all provided Loggers.
 	//
 	// If name is empty, then an implementation defined default name will be
 	// used instead.

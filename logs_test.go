@@ -30,7 +30,7 @@ func (*testLoggerProvider) Logger(_ string, _ ...logs.LoggerOption) logs.Logger 
 	return logs.NewNoopLoggerProvider().Logger("")
 }
 
-func TestMultipleGlobalTracerProvider(t *testing.T) {
+func TestMultipleGlobalLoggerProvider(t *testing.T) {
 	p1 := testLoggerProvider{}
 	p2 := logs.NewNoopLoggerProvider()
 	SetLoggerProvider(&p1)
