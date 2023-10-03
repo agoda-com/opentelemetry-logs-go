@@ -347,7 +347,12 @@ func (d *httpClient) UploadLogs(ctx context.Context, protoLogs []*logspb.Resourc
 			}
 			return newResponseError(resp.Header)
 		default:
-			return fmt.Errorf("failed to send to %s: %s", request.URL, resp.Status)
+			buffer := make([]byte, 4096)
+			_, _ = resp.Body.Read(buffer)
+			if len(buffer) == 0 {
+				return fmt.Errorf("failed to send to %s: %s", request.URL, resp.Status)
+			}
+			return fmt.Errorf("failed to send to %s: %s\n%s", request.URL, resp.Status, buffer)
 		}
 	})
 }
