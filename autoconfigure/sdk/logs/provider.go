@@ -51,10 +51,6 @@ func WithResource(r *resource.Resource) LoggerProviderOption {
 	})
 }
 
-//type loggerProviderConfig struct {
-//	options []sdk.LoggerProviderOption
-//}
-
 func applyLoggerProviderExporterEnvConfigs(ctx context.Context, cfg loggerProviderConfig) loggerProviderConfig {
 
 	// if processors already defined explicitly - skip env configuration
@@ -74,15 +70,21 @@ func applyLoggerProviderExporterEnvConfigs(ctx context.Context, cfg loggerProvid
 		case logsExporterNone:
 		case logsExporterOTLP:
 			otlpExporter, err := otlplogs.NewExporter(ctx)
-			global.Error(err, "Can't instantiate otlp exporter")
+			if err != nil {
+				global.Error(err, "Can't instantiate otlp exporter")
+			}
 			cfg.processors = append(cfg.processors, sdk.NewBatchLogRecordProcessor(otlpExporter))
 		case logsExporterLogging:
 			sdtoutExporter, err := stdoutlogs.NewExporter()
-			global.Error(err, "Can't instantiate logging exporter")
+			if err != nil {
+				global.Error(err, "Can't instantiate logging exporter")
+			}
 			cfg.processors = append(cfg.processors, sdk.NewSimpleLogRecordProcessor(sdtoutExporter))
 		default:
 			err := errors.New("Exporter " + exporter + " is not supported")
-			global.Error(err, "Can't instantiate "+exporter+" exporter")
+			if err != nil {
+				global.Error(err, "Can't instantiate "+exporter+" exporter")
+			}
 		}
 	}
 	return cfg
