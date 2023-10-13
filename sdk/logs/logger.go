@@ -40,7 +40,10 @@ func (l logger) Emit(logRecord logs.LogRecord) {
 		return
 	}
 
-	pr := l.provider.resource
+	pr, err := resource.Merge(l.provider.resource, logRecord.Resource())
+	if err != nil {
+		return
+	}
 
 	elr := &exportableLogRecord{
 		timestamp:            logRecord.Timestamp(),
