@@ -29,7 +29,7 @@ import (
 )
 
 const (
-	defaultLoggerName = "gitlab.agodadev.io/devenv/devstack/pkg/otel/sdk/logger"
+	defaultLoggerName = "github.com/agoda-com/opentelemetry-logs-go/sdk/logs/provider"
 )
 
 // loggerProviderConfig Configuration for Logger Provider
@@ -175,17 +175,17 @@ func NewLoggerProvider(opts ...LoggerProviderOption) *LoggerProvider {
 
 	global.Info("LoggerProvider created", "config", o)
 
-	spss := make(logRecordProcessorStates, 0, len(o.processors))
-	for _, sp := range o.processors {
-		spss = append(spss, newLogsProcessorState(sp))
+	lrpss := make(logRecordProcessorStates, 0, len(o.processors))
+	for _, lrp := range o.processors {
+		lrpss = append(lrpss, newLogsProcessorState(lrp))
 	}
-	lp.logProcessors.Store(&spss)
+	lp.logProcessors.Store(&lrpss)
 
 	return lp
 
 }
 
-func (p *LoggerProvider) getLogsProcessors() logRecordProcessorStates {
+func (p *LoggerProvider) getLogRecordProcessorStates() logRecordProcessorStates {
 	return *(p.logProcessors.Load())
 }
 
@@ -202,7 +202,7 @@ func (p LoggerProvider) Shutdown(ctx context.Context) error {
 	}
 
 	var retErr error
-	for _, sps := range p.getLogsProcessors() {
+	for _, lrps := range p.getLogRecordProcessorStates() {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -210,8 +210,8 @@ func (p LoggerProvider) Shutdown(ctx context.Context) error {
 		}
 
 		var err error
-		sps.state.Do(func() {
-			err = sps.lp.Shutdown(ctx)
+		lrps.state.Do(func() {
+			err = lrps.lp.Shutdown(ctx)
 		})
 		if err != nil {
 			if retErr == nil {
@@ -230,19 +230,19 @@ func (p LoggerProvider) Shutdown(ctx context.Context) error {
 // ForceFlush immediately exports all logs that have not yet been exported for
 // all the registered log processors.
 func (p *LoggerProvider) ForceFlush(ctx context.Context) error {
-	spss := p.getLogsProcessors()
-	if len(spss) == 0 {
+	lrpss := p.getLogRecordProcessorStates()
+	if len(lrpss) == 0 {
 		return nil
 	}
 
-	for _, sps := range spss {
+	for _, lrps := range lrpss {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
 		}
 
-		if err := sps.lp.ForceFlush(ctx); err != nil {
+		if err := lrps.lp.ForceFlush(ctx); err != nil {
 			return err
 		}
 	}
