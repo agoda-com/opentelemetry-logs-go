@@ -35,7 +35,7 @@ type logger struct {
 var _ logs.Logger = &logger{}
 
 func (l logger) Emit(logRecord logs.LogRecord) {
-	lps := l.provider.getLogsProcessors()
+	lps := l.provider.getLogRecordProcessorStates()
 	if len(lps) == 0 {
 		return
 	}
