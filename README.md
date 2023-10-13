@@ -110,3 +110,8 @@ func main() {
 }
 ```
 
+## References
+
+Logger Bridge API implementations for `zap`, `slog`, `zerolog` and other
+loggers can be found in https://github.com/agoda-com/opentelemetry-go
+
