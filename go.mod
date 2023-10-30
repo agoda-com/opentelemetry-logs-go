@@ -13,7 +13,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.0.0
 	go.uber.org/goleak v1.2.1
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230920204549-e6e6cdab5c13
-	google.golang.org/grpc v1.58.2
+	google.golang.org/grpc v1.58.3
 	google.golang.org/protobuf v1.31.0
 )
 
