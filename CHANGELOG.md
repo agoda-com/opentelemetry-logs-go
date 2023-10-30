@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.4.2] 2023-10-30
+
+### Fixed
+
+- fix: accept any 2xx status code in otlplogshttp client (#26)
+- fix: show the error body when status code is unknown (#27)
+- fix: grpc rapid-reset vulnerability (#28)
+
 ## [v0.4.1] 2023-10-13
 
 ### Fixed
