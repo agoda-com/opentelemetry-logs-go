@@ -38,3 +38,17 @@ jobs:
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  test-race:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.DEFAULT_GO_VERSION }}
+          check-latest: true
+          cache-dependency-path: "**/go.sum"
+      - name: Run tests with race detector
+        run: make test-race
