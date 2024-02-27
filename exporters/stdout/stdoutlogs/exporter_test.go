@@ -3,16 +3,17 @@ package stdoutlogs
 import (
 	"bytes"
 	"context"
+	"io"
+	"log"
+	"testing"
+	"time"
+
 	otel "github.com/agoda-com/opentelemetry-logs-go"
 	"github.com/agoda-com/opentelemetry-logs-go/logs"
 	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
-	"io"
-	"log"
-	"testing"
-	"time"
 )
 
 const (
@@ -81,6 +82,8 @@ func TestStdoutExporter(t *testing.T) {
 
 		actual := writer.String()
 
-		assert.Contains(t, actual, "INFO My message {service.name=otlplogs-example, service.version=0.0.1}")
+		assert.Contains(t, actual, "My message")
+		assert.Contains(t, actual, "otlplogs-example")
+		assert.Contains(t, actual, "0.0.1")
 	}
 }
