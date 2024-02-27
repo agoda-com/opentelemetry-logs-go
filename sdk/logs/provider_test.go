@@ -17,8 +17,8 @@ limitations under the License.
 package logs
 
 import (
-	//	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/otlplogshttp"
-	"github.com/agoda-com/opentelemetry-logs-go/logs"
+	//	"github.com/kudarap/opentelemetry-logs-go/exporters/otlp/otlplogs/otlplogshttp"
+	"github.com/kudarap/opentelemetry-logs-go/logs"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 	"testing"

@@ -19,7 +19,7 @@ package otlpconfig
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
+	"github.com/kudarap/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"

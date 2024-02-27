@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/envconfig"
+	"github.com/kudarap/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/envconfig"
 )
 
 const (

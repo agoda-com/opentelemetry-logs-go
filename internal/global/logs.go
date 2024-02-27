@@ -17,7 +17,7 @@ limitations under the License.
 package global
 
 import (
-	"github.com/agoda-com/opentelemetry-logs-go/logs"
+	"github.com/kudarap/opentelemetry-logs-go/logs"
 	"sync"
 	"sync/atomic"
 )

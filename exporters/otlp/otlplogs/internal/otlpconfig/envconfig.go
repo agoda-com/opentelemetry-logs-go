@@ -19,7 +19,7 @@ package otlpconfig
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/envconfig"
+	"github.com/kudarap/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/envconfig"
 	"net/url"
 	"os"
 	"path"

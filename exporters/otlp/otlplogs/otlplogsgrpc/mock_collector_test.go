@@ -3,7 +3,7 @@ package otlplogsgrpc_test
 import (
 	"context"
 	"fmt"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlplogstest"
+	"github.com/kudarap/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlplogstest"
 	"github.com/stretchr/testify/require"
 	collectorlogspb "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 	logspb "go.opentelemetry.io/proto/otlp/logs/v1"

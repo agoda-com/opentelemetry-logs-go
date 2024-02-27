@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package logs // Package logs import "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
+package logs // Package logs import "github.com/kudarap/opentelemetry-logs-go/sdk/logs"
 
 import (
 	"context"
 	"fmt"
-	"github.com/agoda-com/opentelemetry-logs-go/internal/global"
-	"github.com/agoda-com/opentelemetry-logs-go/logs"
+	"github.com/kudarap/opentelemetry-logs-go/internal/global"
+	"github.com/kudarap/opentelemetry-logs-go/logs"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/sdk/instrumentation"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -29,7 +29,7 @@ import (
 )
 
 const (
-	defaultLoggerName = "github.com/agoda-com/opentelemetry-logs-go/sdk/logs/provider"
+	defaultLoggerName = "github.com/kudarap/opentelemetry-logs-go/sdk/logs/provider"
 )
 
 // loggerProviderConfig Configuration for Logger Provider

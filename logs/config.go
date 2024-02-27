@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package logs // Package logs import "github.com/agoda-com/opentelemetry-logs-go/logs"
+package logs // Package logs import "github.com/kudarap/opentelemetry-logs-go/logs"
 
 import "go.opentelemetry.io/otel/attribute"
 

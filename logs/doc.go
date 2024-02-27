@@ -39,7 +39,7 @@ operation being performed as part of a logging workflow. In its simplest form:
 A Logger is unique to the instrumentation and is used to create Logs.
 Instrumentation should be designed to accept a LoggerProvider from which it
 can create its own unique Logger. Alternatively, the registered global
-LoggerProvider from the github.com/agoda-com/opentelemetry-logs-go package can be used as
+LoggerProvider from the github.com/kudarap/opentelemetry-logs-go package can be used as
 a default.
 
 	const (
@@ -65,4 +65,4 @@ a default.
 		// ...
 	}
 */
-package logs // import "github.com/agoda-com/opentelemetry-logs-go/logs"
+package logs // import "github.com/kudarap/opentelemetry-logs-go/logs"

@@ -22,9 +22,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
-	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
+	"github.com/kudarap/opentelemetry-logs-go/exporters/otlp/otlplogs/internal"
+	"github.com/kudarap/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
+	"github.com/kudarap/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
 
 	"go.opentelemetry.io/otel"
 	collogspb "go.opentelemetry.io/proto/otlp/collector/logs/v1"

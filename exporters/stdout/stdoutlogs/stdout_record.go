@@ -17,8 +17,8 @@ limitations under the License.
 package stdoutlogs
 
 import (
-	"github.com/agoda-com/opentelemetry-logs-go/logs"
-	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
+	"github.com/kudarap/opentelemetry-logs-go/logs"
+	sdk "github.com/kudarap/opentelemetry-logs-go/sdk/logs"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/instrumentation"
 	"go.opentelemetry.io/otel/sdk/resource"

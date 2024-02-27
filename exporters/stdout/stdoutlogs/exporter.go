@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"sync"
 
-	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
+	sdk "github.com/kudarap/opentelemetry-logs-go/sdk/logs"
 )
 
 var _ sdk.LogRecordExporter = &Exporter{}
