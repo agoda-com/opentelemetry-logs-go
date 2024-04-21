@@ -19,7 +19,7 @@ import (
 	"os"
 	"context"
 	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 	autosdk "github.com/agoda-com/opentelemetry-logs-go/autoconfigure/sdk/logs"
 )
 
