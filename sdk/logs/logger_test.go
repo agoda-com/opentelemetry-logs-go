@@ -66,6 +66,6 @@ func TestLogsReadWriteAPIFormat(t *testing.T) {
 		&timestamp,
 	)
 
-	assert.Equal(t, "My Log Message", *record.Body())
+	assert.Equal(t, "My Log Message", *(record.Body().(*string)))
 
 }

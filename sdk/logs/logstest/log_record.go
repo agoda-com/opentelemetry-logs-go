@@ -35,7 +35,7 @@ type LogRecordStub struct {
 	TraceFlags           *trace.TraceFlags
 	SeverityText         *string
 	SeverityNumber       *logs.SeverityNumber
-	Body                 *string
+	Body                 any
 	Resource             *resource.Resource
 	InstrumentationScope *instrumentation.Scope
 	Attributes           *[]attribute.KeyValue
@@ -88,7 +88,7 @@ type logRecordSnapshot struct {
 	traceFlags           *trace.TraceFlags
 	severityText         *string
 	severityNumber       *logs.SeverityNumber
-	body                 *string
+	body                 any
 	resource             *resource.Resource
 	instrumentationScope *instrumentation.Scope
 	attributes           *[]attribute.KeyValue
@@ -104,6 +104,6 @@ func (r *logRecordSnapshot) InstrumentationScope() *instrumentation.Scope {
 }
 func (r *logRecordSnapshot) SeverityText() *string                { return r.severityText }
 func (r *logRecordSnapshot) SeverityNumber() *logs.SeverityNumber { return r.severityNumber }
-func (r *logRecordSnapshot) Body() *string                        { return r.body }
+func (r *logRecordSnapshot) Body() any                            { return r.body }
 func (r *logRecordSnapshot) Resource() *resource.Resource         { return r.resource }
 func (r *logRecordSnapshot) Attributes() *[]attribute.KeyValue    { return r.attributes }
