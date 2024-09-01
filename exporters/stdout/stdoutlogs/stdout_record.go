@@ -17,12 +17,14 @@ limitations under the License.
 package stdoutlogs
 
 import (
-	"github.com/kudarap/opentelemetry-logs-go/logs"
-	sdk "github.com/kudarap/opentelemetry-logs-go/sdk/logs"
+	"fmt"
+	"github.com/agoda-com/opentelemetry-logs-go/logs"
+	sdk "github.com/agoda-com/opentelemetry-logs-go/sdk/logs"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/instrumentation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/trace"
+	"reflect"
 	"time"
 )
 
@@ -81,7 +83,7 @@ func logRecordsFromReadableLogRecords(logRecords []sdk.ReadableLogRecord) []stdO
 			TraceFlags:           lr.TraceFlags(),
 			SeverityText:         lr.SeverityText(),
 			SeverityNumber:       lr.SeverityNumber(),
-			Body:                 lr.Body(),
+			Body:                 convertBodyToString(lr.Body()),
 			Resource:             lr.Resource(),
 			InstrumentationScope: lr.InstrumentationScope(),
 			Attributes:           lr.Attributes(),
@@ -89,4 +91,43 @@ func logRecordsFromReadableLogRecords(logRecords []sdk.ReadableLogRecord) []stdO
 		result = append(result, logRecord)
 	}
 	return result
+}
+
+func convertBodyToString(body any) *string {
+	typ := reflect.TypeOf(body)
+	val := reflect.ValueOf(body)
+	if valueIsNil(typ, val) {
+		return nil
+	}
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+		val = val.Elem()
+	}
+	if !val.CanInterface() {
+		return nil
+	}
+	var str string
+	switch {
+	case typ.ConvertibleTo(reflect.TypeOf(time.Time{})):
+		valTime := val.Convert(reflect.TypeOf(time.Time{})).Interface().(time.Time)
+		str = valTime.Format(time.RFC3339Nano)
+	case typ.Kind() == reflect.Struct:
+		str = fmt.Sprintf("%+v", val.Interface())
+	default:
+		str = fmt.Sprintf("%v", val.Interface())
+	}
+	return &str
+}
+
+func valueIsNil(typ reflect.Type, val reflect.Value) bool {
+	if typ == nil {
+		return true
+	}
+	switch val.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Pointer, reflect.UnsafePointer,
+		reflect.Interface, reflect.Slice:
+		return val.IsNil()
+	default:
+		return false
+	}
 }

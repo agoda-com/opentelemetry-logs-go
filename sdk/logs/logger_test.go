@@ -22,7 +22,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/instrumentation"
 	sdkresource "go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 	"go.opentelemetry.io/otel/trace"
 	"testing"
 	"time"
@@ -66,6 +66,6 @@ func TestLogsReadWriteAPIFormat(t *testing.T) {
 		&timestamp,
 	)
 
-	assert.Equal(t, "My Log Message", *record.Body())
+	assert.Equal(t, "My Log Message", *(record.Body().(*string)))
 
 }
