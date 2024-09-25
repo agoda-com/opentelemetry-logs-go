@@ -19,6 +19,10 @@ package otlpconfig
 import (
 	"crypto/tls"
 	"fmt"
+	"path"
+	"strings"
+	"time"
+
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
@@ -26,9 +30,6 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/encoding/gzip"
-	"path"
-	"strings"
-	"time"
 )
 
 const (
@@ -66,6 +67,9 @@ type (
 		ServiceConfig      string
 		DialOptions        []grpc.DialOption
 		GRPCConn           *grpc.ClientConn
+
+		// http configurations
+		IgnoreProxy bool
 	}
 )
 

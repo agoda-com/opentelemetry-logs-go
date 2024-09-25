@@ -18,9 +18,10 @@ package otlplogshttp
 
 import (
 	"crypto/tls"
+	"time"
+
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
-	"time"
 )
 
 // Compression describes the compression used for payloads sent to the
@@ -68,6 +69,13 @@ func (w wrappedOption) applyHTTPOption(cfg otlpconfig.Config) otlpconfig.Config 
 // must not contain any URL path.
 func WithEndpoint(endpoint string) Option {
 	return wrappedOption{otlpconfig.WithEndpoint(endpoint)}
+}
+
+func WithNoProxy() Option {
+	return wrappedOption{otlpconfig.NewHTTPOption(func(cfg otlpconfig.Config) otlpconfig.Config {
+		cfg.IgnoreProxy = true
+		return cfg
+	})}
 }
 
 // WithJsonProtocol will apply http/json protocol to Http client

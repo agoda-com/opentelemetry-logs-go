@@ -21,6 +21,14 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
+	"io"
+	"net"
+	"net/http"
+	"net/url"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/otlpconfig"
 	"github.com/agoda-com/opentelemetry-logs-go/exporters/otlp/otlplogs/internal/retry"
@@ -29,13 +37,6 @@ import (
 	logspb "go.opentelemetry.io/proto/otlp/logs/v1"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
-	"io"
-	"net"
-	"net/http"
-	"net/url"
-	"strconv"
-	"sync"
-	"time"
 )
 
 const contentTypeProto = "application/x-protobuf"
@@ -92,6 +93,12 @@ func NewClient(opts ...Option) *httpClient {
 	if cfg.Logs.TLSCfg != nil {
 		transport := ourTransport.Clone()
 		transport.TLSClientConfig = cfg.Logs.TLSCfg
+		client.Transport = transport
+	}
+
+	if cfg.IgnoreProxy {
+		transport := ourTransport.Clone()
+		transport.Proxy = nil
 		client.Transport = transport
 	}
 
