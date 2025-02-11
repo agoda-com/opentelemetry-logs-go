@@ -22,7 +22,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/instrumentation"
 	sdkresource "go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.27.0"
 	"go.opentelemetry.io/otel/trace"
 	"testing"
 	"time"
@@ -46,13 +46,13 @@ func TestLogsReadWriteAPIFormat(t *testing.T) {
 	body := "My Log Message"
 	severityText := "INFO"
 	severityNumber := logs.INFO
-	resource := sdkresource.NewWithAttributes("http", semconv.HTTPURL("testurl"))
+	resource := sdkresource.NewWithAttributes("http", semconv.URLFull("testurl"))
 	instrumentationScope := instrumentation.Scope{
 		Name:      "test",
 		Version:   "testVersion",
 		SchemaURL: "http",
 	}
-	attributes := []attribute.KeyValue{semconv.HTTPURL("testurl")}
+	attributes := []attribute.KeyValue{semconv.URLFull("testurl")}
 	timestamp := time.Now()
 
 	record := newReadWriteLogRecord(
