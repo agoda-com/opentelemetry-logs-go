@@ -22,7 +22,7 @@ repository Logs module will have status "Stable".
 
 ## Compatibility 
 
-Minimal supported go version `1.21`
+Minimal supported go version `1.22`
 
 ## Project packages
 
